@@ -8,14 +8,12 @@
 </head>
 <body>
     {% for playlist in playlists %}
-    <div class="playlist" id = "{{playlist.id}}">
-      <button>
+    <div class="playlist" id = "{{playlist.id}}" name = "{{playlist.name}}">
         <img src="{{ playlist.logo }}" alt="{{ playlist.name }}">
-      </button>
       {{ playlist.name }}
     </div>
   {% endfor %}
-
+    <button> next</button>
   <script src = "../static/index.js"></script>
 </body>
 </html>

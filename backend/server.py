@@ -28,10 +28,15 @@ def redirect_page():
     return redirect(url_for("display_playlists"))
 
 
-@app.route("/get-playlists")
+@app.route("/get-playlists", methods = ["POST", "GET"])
 def display_playlists():
-   data = get_playlists()
-   return render_template("playlists.html", playlists = data)
+   if request.method == "GET":
+       data = get_playlists()
+       return render_template("playlists.html", playlists = data)
+   else:
+       data = request.get_json()
+       get_songs(data.get("playlists"))
+       
 
 
 if __name__ == "__main__":

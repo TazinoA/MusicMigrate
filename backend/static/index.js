@@ -1,11 +1,13 @@
+import axios from "axios"
+
 let playlists = document.querySelectorAll(".playlist");
-let selected = new Set();
+let selected = {};
 function handleClick(playlist){
-    if(selected.has(playlist.id)){
-        selected.delete(playlist.id);
+    if(playlist.id in selected){
+        delete selected[playlist.id];
         playlist.classList.remove("selected");
     }else{
-        selected.add(playlist.id);
+        selected[playlist.id] = playlist.name;
         playlist.classList.add("selected");
     }
 }
@@ -15,3 +17,13 @@ playlists.forEach(playlist => {
         handleClick(playlist)
     })
 })
+
+function handleSubmit(){
+    axios.post("http://127.0.0.1:8000/get-playlists",
+        {
+            playlists: selected,
+        }
+    )
+}
+
+document.querySelector("button").addEventListener("click", handleSubmit)

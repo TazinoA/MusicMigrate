@@ -31,6 +31,31 @@ def get_client():
     return spotipy.Spotify(auth = token_info["access_token"])
 
 
+def get_songs(playlist_id):
+    sp = get_client()
+    fields = "items(track(name,artists(name),album(name),duration_ms)),next"
+
+    songs = []
+    results = sp.playlist_items(playlist_id, fields = fields)
+
+    while True:
+        for item in results["items"]:
+            track = item["track"]
+            song_dict = {
+                'name': track['name'],
+                'artists': [artist['name'] for artist in track['artists']],
+                'album': track['album']['name'],
+                'duration_ms': track['duration_ms']
+            }
+            songs.append(song_dict)
+        
+        if results["next"]:
+            results = sp.next(results)
+        else:
+            break
+    
+    return songs
+
 def get_song_uri(song):
     sp = get_client()
     response = sp.search(song, limit = 1, type = "track")
