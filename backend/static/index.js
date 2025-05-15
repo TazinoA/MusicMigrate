@@ -1,13 +1,13 @@
 import axios from "axios"
 
 let playlists = document.querySelectorAll(".playlist");
-let selected = {};
+let selected = new Set();
 function handleClick(playlist){
-    if(playlist.id in selected){
-        delete selected[playlist.id];
+    if(selected.has([playlist.id, playlist.name])){
+        selected.remove(playlist.id, playlist.name);
         playlist.classList.remove("selected");
     }else{
-        selected[playlist.id] = playlist.name;
+        selected.add(playlist.id, playlist.name);
         playlist.classList.add("selected");
     }
 }

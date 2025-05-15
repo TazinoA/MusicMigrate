@@ -31,39 +31,36 @@ def get_client():
     return spotipy.Spotify(auth = token_info["access_token"])
 
 
-def get_songs(playlist_id):
+def get_songs(playlist_ids):
     sp = get_client()
     fields = "items(track(name,artists(name),album(name),duration_ms)),next"
+    playlists = []
 
-    songs = []
-    results = sp.playlist_items(playlist_id, fields = fields)
-
-    while True:
-        for item in results["items"]:
-            track = item["track"]
-            song_dict = {
-                'name': track['name'],
-                'artists': [artist['name'] for artist in track['artists']],
-                'album': track['album']['name'],
-                'duration_ms': track['duration_ms']
-            }
-            songs.append(song_dict)
-        
-        if results["next"]:
-            results = sp.next(results)
-        else:
-            break
     
-    return songs
+    for playlist in playlist_ids:
+        songs = []
+        results = sp.playlist_items(playlist[0], fields = fields)
 
-def get_song_uri(song):
-    sp = get_client()
-    response = sp.search(song, limit = 1, type = "track")
-    return response["tracks"]["items"][0]["uri"]
+        while True:
+            for item in results["items"]:
+                track = item["track"]
+                song_dict = {
+                    'name': track['name'],
+                    'artists': [artist['name'] for artist in track['artists']],
+                    'album': track['album']['name'],
+                    'duration_ms': track['duration_ms']
+                }
+                songs.append(song_dict)
+            
+            if results["next"]:
+                results = sp.next(results)
+            else:
+                break
+        
+        playlists.append({playlist[1]: songs})
+    
+    return playlists
 
-def add_songs(playlist_id, tracks):
-    sp = get_client()
-    sp.playlist_add_items(playlist_id=playlist_id, items=tracks)
 
 
 def get_playlists():
@@ -80,3 +77,14 @@ def get_playlists():
             "id": data["id"]
         })
     return playlists
+
+
+
+def get_song_uri(song):
+    sp = get_client()
+    response = sp.search(song, limit = 1, type = "track")
+    return response["tracks"]["items"][0]["uri"]
+
+def add_songs(playlist_id, tracks):
+    sp = get_client()
+    sp.playlist_add_items(playlist_id=playlist_id, items=tracks)

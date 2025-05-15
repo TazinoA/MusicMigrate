@@ -35,7 +35,7 @@ def display_playlists():
        return render_template("playlists.html", playlists = data)
    else:
        data = request.get_json()
-       get_songs(data.get("playlists"))
+       playlist_songs = get_songs(data.get("playlists"))
        
 
 
