@@ -1,0 +1,41 @@
+from flask import Flask, redirect,url_for,session,request
+import spotipy
+from spotipy.oauth2 import SpotifyOAuth
+from dotenv import load_dotenv
+import time
+import os
+
+
+load_dotenv()
+
+def get_sp():
+    sp_oauth = SpotifyOAuth(client_id=os.getenv("CLIENT_ID"), client_secret=os.getenv("CLIENT_SECRET"),
+                            redirect_uri=url_for("redirect_page", _external=True),
+                            scope="playlist-read-private playlist-modify-public playlist-modify-private playlist-read-collaborative ugc-image-upload user-top-read")
+    return sp_oauth
+
+def get_client():
+    token_info = session.get("token_info")
+    if not token_info:
+        return redirect(url_for("get_auth"))
+    expiration_time = session['start_time'] + session['expires_in']
+
+    if time.time() > expiration_time:
+        sp_oauth = get_sp()
+        refresh_token = token_info["refresh_token"]
+        token_info = sp_oauth.refresh_access_token(refresh_token)
+        session["token_info"] = token_info
+        session['start_time'] = time.time()
+
+
+    return spotipy.Spotify(auth = token_info["access_token"])
+
+
+def get_song_uri(song):
+    sp = get_client()
+    response = sp.search(song, limit = 1, type = "track")
+    return response["tracks"]["items"][0]["uri"]
+
+def add_songs(playlist_id, tracks):
+    sp = get_client()
+    sp.playlist_add_items(playlist_id=playlist_id, items=tracks)
