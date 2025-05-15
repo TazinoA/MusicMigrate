@@ -3,9 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel = "stylesheet" href = "../static/styles.css"/>
     <title>Playlists</title>
 </head>
 <body>
-    <h1>hello</h1>
+    {% for playlist in playlists %}
+    <div class="playlist" id = "{{playlist.id}}">
+      <button>
+        <img src="{{ playlist.logo }}" alt="{{ playlist.name }}">
+      </button>
+      {{ playlist.name }}
+    </div>
+  {% endfor %}
+
+  <script src = "../static/index.js"></script>
 </body>
 </html>

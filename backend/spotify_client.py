@@ -39,3 +39,19 @@ def get_song_uri(song):
 def add_songs(playlist_id, tracks):
     sp = get_client()
     sp.playlist_add_items(playlist_id=playlist_id, items=tracks)
+
+
+def get_playlists():
+    sp = get_client()
+    response = sp.current_user_playlists(limit = 50)
+
+    playlists = []
+
+    for data in response["items"]:
+        url = data["images"][0]["url"]
+        playlists.append({
+            "logo": url if url else "hello",
+            "name": data["name"],
+            "id": data["id"]
+        })
+    return playlists

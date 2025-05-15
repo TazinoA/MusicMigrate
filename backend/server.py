@@ -25,12 +25,13 @@ def redirect_page():
     session["token_info"] = token_info
     session['expires_in'] = token_info['expires_in']
     session['start_time'] = time.time()
-    return redirect(url_for("get_playlists"))
+    return redirect(url_for("display_playlists"))
 
 
 @app.route("/get-playlists")
-def get_playlists():
-   return render_template("playlists.html")
+def display_playlists():
+   data = get_playlists()
+   return render_template("playlists.html", playlists = data)
 
 
 if __name__ == "__main__":

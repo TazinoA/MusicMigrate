@@ -8,7 +8,9 @@ function Card(props){
     }
 
     return <div className = "card">
-        <img src = {props.logo} alt = {props.name} onClick = {handleClick}></img>
+        <button onClick = {handleClick}>
+            <img src = {props.logo} alt = {props.name}></img>
+            </button>
         </div>
 }
 
