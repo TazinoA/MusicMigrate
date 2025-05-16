@@ -4,6 +4,7 @@ import os
 from datetime import timedelta
 from spotify_client import *
 from flask_cors import CORS
+from ytMusic_client import *
 
 
 app = Flask(__name__)
@@ -41,8 +42,8 @@ def display_playlists():
        if isinstance(result, Response):
            return result
        
-       print(result)
-       return jsonify(result)
+       add_ytSongs(result)
+       return "Checking"
        
 
 
