@@ -1,13 +1,17 @@
-import axios from "axios"
+import axios from "https://esm.sh/axios"
 
 let playlists = document.querySelectorAll(".playlist");
-let selected = new Set();
+let selected = new Map();
+
 function handleClick(playlist){
-    if(selected.has([playlist.id, playlist.name])){
-        selected.remove(playlist.id, playlist.name);
+    const name = playlist.getAttribute("name");
+    const id = playlist.id;
+
+    if(selected.has(id)){
+        selected.delete(id);
         playlist.classList.remove("selected");
     }else{
-        selected.add(playlist.id, playlist.name);
+        selected.set(id, [id, name]);
         playlist.classList.add("selected");
     }
 }
@@ -19,9 +23,12 @@ playlists.forEach(playlist => {
 })
 
 function handleSubmit(){
+    if(selected.size === 0){
+        return
+    }
     axios.post("http://127.0.0.1:8000/get-playlists",
         {
-            playlists: selected,
+            playlists: Array.from(selected.values()),
         }
     )
 }

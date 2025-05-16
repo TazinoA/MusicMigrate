@@ -18,6 +18,7 @@ def get_client():
     token_info = session.get("token_info")
     if not token_info:
         return redirect(url_for("get_auth"))
+    
     expiration_time = session['start_time'] + session['expires_in']
 
     if time.time() > expiration_time:
@@ -31,35 +32,39 @@ def get_client():
     return spotipy.Spotify(auth = token_info["access_token"])
 
 
-def get_songs(playlist_ids):
+def get_songs(playlists):
     sp = get_client()
-    fields = "items(track(name,artists(name),album(name),duration_ms)),next"
-    playlists = []
-
+    if not isinstance(sp, spotipy.Spotify):
+        return sp
     
-    for playlist in playlist_ids:
+
+    fields = "items(track(name,artists(name),album(name),duration_ms)),next"
+    playlists_list = []
+
+    for playlist_id, playlist_name in playlists:
+        result = sp.playlist_items(playlist_id=playlist_id, fields = fields)
         songs = []
-        results = sp.playlist_items(playlist[0], fields = fields)
 
         while True:
-            for item in results["items"]:
+            for item in result["items"]:
                 track = item["track"]
-                song_dict = {
-                    'name': track['name'],
-                    'artists': [artist['name'] for artist in track['artists']],
-                    'album': track['album']['name'],
-                    'duration_ms': track['duration_ms']
+                if not track:
+                    continue
+                data = {
+                    "song": track["name"],
+                    "artist": track["artists"][0]["name"],
+                    "album": track["album"]["name"],
+                    "duration": track["duration_ms"]
                 }
-                songs.append(song_dict)
-            
-            if results["next"]:
-                results = sp.next(results)
+                songs.append(data)
+            if result["next"]:
+                result = sp.next(result)
             else:
                 break
         
-        playlists.append({playlist[1]: songs})
+        playlists_list.append([playlist_name, songs])
     
-    return playlists
+    return playlists_list
 
 
 

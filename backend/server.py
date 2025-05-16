@@ -1,4 +1,4 @@
-from flask import Flask, redirect,url_for,render_template,session,request
+from flask import Flask, redirect,url_for,render_template,session,request,jsonify, Response
 import time
 import os
 from datetime import timedelta
@@ -35,7 +35,14 @@ def display_playlists():
        return render_template("playlists.html", playlists = data)
    else:
        data = request.get_json()
-       playlist_songs = get_songs(data.get("playlists"))
+       playlists = data.get("playlists")
+       result = get_songs(playlists)
+       
+       if isinstance(result, Response):
+           return result
+       
+       print(result)
+       return jsonify(result)
        
 
 
