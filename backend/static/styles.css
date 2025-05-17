@@ -9,6 +9,7 @@
     border-radius: 15px;
     font-size: 25px;
     font-weight: bold;
+    background-color: #3D4158;
 }
 img{
     height: 200px;
@@ -26,6 +27,7 @@ body{
     justify-content: center;
     align-items: center;
     height: 70vh;
+    background-color: #181D38
 }
 
 .selected{

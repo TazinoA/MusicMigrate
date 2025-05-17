@@ -42,8 +42,9 @@ def display_playlists():
        if isinstance(result, Response):
            return result
        
-       add_ytSongs(result)
-       return "Checking"
+       unfound = add_ytSongs(result)
+       print(unfound)
+       return redirect("https://google.com")
        
 
 

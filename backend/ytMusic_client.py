@@ -3,6 +3,8 @@ import os
 from dotenv import load_dotenv, find_dotenv
 import json
 import time
+from difflib import SequenceMatcher
+import re
 
 load_dotenv(find_dotenv())
 client_id =os.getenv("YT_CLIENT_ID")
@@ -15,10 +17,14 @@ def get_yt_auth():
 
 
 def get_ytClient():
-    with open(AUTH_FILE, "r", encoding="utf-8") as f:
-        auth_data = json.load(f)
-        expires_at = auth_data.get("expires_at")
-        refresh_token = auth_data.get("refresh_token")
+    try:
+        with open(AUTH_FILE, "r", encoding="utf-8") as f:
+            auth_data = json.load(f)
+    except json.JSONDecodeError:
+        auth_data = {}
+    
+    expires_at = auth_data.get("expires_at")
+    refresh_token = auth_data.get("refresh_token")
     
     if not refresh_token:
         get_yt_auth()
@@ -48,26 +54,6 @@ def get_ytClient():
     ytmusic = YTMusic(AUTH_FILE, oauth_credentials=oauth_credentials)
     return ytmusic
 
-    
-
-
-def add_ytSongs(playlists):
-    client = get_ytClient()
-    for playlist_name, songs in playlists:
-        playlist_id = create_playlist(playlist_name)
-        video_ids = []
-        for track in songs:
-            result = client.search(query = f"{track["song"]} {track["artist"]}",filter = "songs", limit = 5)[:5]
-
-            for song in result:
-                artist = song["artists"][0]["name"]
-                if song["title"] == track["song"] and artist == track["artist"]:
-                    video_ids.append(song["videoId"])
-                    break
-        
-        client.add_playlist_items(playlistId=playlist_id, videoIds=video_ids)
-        
-
 
 def create_playlist(name):
     client = get_ytClient()
@@ -75,3 +61,162 @@ def create_playlist(name):
     playlist_id = client.create_playlist(title = name, description = "Made from Tranfer Playlists")
     return playlist_id
 
+def is_similar(a,b,threshold =0.8):
+    if not a or not b:
+        return False
+    return SequenceMatcher(None, a.lower(), b.lower()).ratio() > threshold
+
+
+def clean_text(text):
+    if not text:
+        return ""
+    text = text.lower()
+    text = re.sub(r"\(.*?\)|\[.*?\]|-.*", "", text)  # remove (extra), [extra], - versions
+    text = re.sub(r"[^\w\s]", "", text)  # remove punctuation
+    return text.strip()
+
+
+def add_ytSongs(playlists):
+    print("start")
+    client = get_ytClient()
+    could_not_find = {}
+
+
+    for playlist_name, songs in playlists:
+        could_not_find[playlist_name] = []
+        playlist_id = create_playlist(playlist_name)
+        video_ids = set()
+
+        for track in songs:
+            search_artists = ' '.join([a for a in track["artists"] if isinstance(a, str) and a.strip()])
+            #print(track["song"])
+            result = client.search(query = f"{track['song']} {search_artists}", filter="songs", limit=5)[:5]
+
+            matched_song = match_song(result, track)
+
+            if not matched_song:
+                result = client.search(query = f"{track['song']} {search_artists}", filter="videos", limit=5)[:5]
+                matched_song = match_song(result, track)
+            
+            if matched_song and "videoId" in matched_song:
+                videoId = matched_song["videoId"]
+                #print(track)
+                if videoId not in video_ids:
+                    video_ids.add(videoId)
+            else:
+                could_not_find[playlist_name].append({
+                    "song": track["song"],
+                    "artists": track["artists"]
+                })
+
+
+            if len(video_ids) >= 50:
+                 response = client.add_playlist_items(playlistId=playlist_id, videoIds=list(video_ids), duplicates = True)
+                 #print(response["status"])
+                 video_ids = set()
+            
+        
+        if video_ids:
+            response = client.add_playlist_items(playlistId=playlist_id, videoIds=list(video_ids), duplicates=True)
+            #print(response["status"])
+
+    return could_not_find
+
+
+def split_artists(name_str):
+    # Split on commas, ampersands (&), 'and', possibly with spaces around
+    parts = re.split(r'\s*,\s*|\s*&\s*|\s+and\s+', name_str)
+    return [part.strip() for part in parts if part.strip()]
+
+def get_result_artists(song):
+    if "artists" in song:
+        artists_list = song["artists"]
+        if len(artists_list) == 1:
+            # Single artist dict, possibly multiple names joined
+            name_str = artists_list[0].get("name", "")
+            # If contains separators, split into multiple
+            if any(sep in name_str for sep in [",", "&", " and "]):
+                return [clean_text(a) for a in split_artists(name_str)]
+            else:
+                return [clean_text(name_str)]
+        else:
+            # Multiple artist dicts, extract normally
+            return [clean_text(a.get("name", "")) for a in artists_list if a.get("name")]
+    elif "artist" in song:
+        return [clean_text(song["artist"])]
+    else:
+        return []
+    
+
+def extract_featured_artists(title):
+    # This will extract text inside parentheses or brackets with "feat" or "ft"
+    featured_artists = []
+    feat_pattern = re.compile(r"\(feat\.? ([^)]+)\)|\[feat\.? ([^\]]+)\]", re.IGNORECASE)
+    matches = feat_pattern.findall(title)
+    for match in matches:
+        # match is a tuple; only one group will have text
+        feat_text = match[0] or match[1]
+        if feat_text:
+            # Split by comma, &, and 'and'
+            artists = re.split(r'\s*,\s*|\s*&\s*|\s+and\s+', feat_text)
+            featured_artists.extend([a.strip() for a in artists if a.strip()])
+    return featured_artists
+
+
+def parse_duration(duration_str):
+    if not duration_str:
+        return 0
+    parts = duration_str.split(':')
+    parts = [int(p) for p in parts]
+    if len(parts) == 2:  # mm:ss
+        return parts[0] * 60 + parts[1]
+    elif len(parts) == 3:  # hh:mm:ss
+        return parts[0] * 3600 + parts[1] * 60 + parts[2]
+    return 0
+
+
+def match_song(results, track):
+    target_title = clean_text(track["song"])
+    target_artists = [clean_text(artist) for artist in track["artists"]]
+
+    # Extract featured artists from the target song title and add to target_artists
+    featured_from_title = extract_featured_artists(track["song"])
+    target_artists += [clean_text(a) for a in featured_from_title]
+
+    target_duration = int(track.get("duration") or 0) // 1000
+
+    best_match = None
+    best_score = 0
+
+    for song in results:
+        title = clean_text(song.get("title"))
+        result_artists = get_result_artists(song)  # Use your robust artist extraction
+
+        # Extract featured artists from YTM song title and add them
+        featured_from_yt_title = extract_featured_artists(song.get("title", ""))
+        result_artists += [clean_text(a) for a in featured_from_yt_title]
+
+        if "duration_seconds" in song and song["duration_seconds"]:
+            duration = song["duration_seconds"]
+        elif "duration" in song and song["duration"]:
+            duration = parse_duration(song["duration"])
+        else:
+            duration = 0
+
+        title_score = SequenceMatcher(None, title, target_title).ratio()
+        artist_matches = [1 for a in result_artists for b in target_artists if is_similar(a, b)]
+        artist_score = len(artist_matches) / max(len(target_artists), 1)
+
+        duration_score = 1.0
+        if target_duration and duration:
+            diff = abs(duration - target_duration)
+            if diff > 10:
+                duration_score = max(0, 1 - (diff / 30))
+
+        total_score = (title_score * 0.5) + (artist_score * 0.3) + (duration_score * 0.2)
+
+        if total_score > best_score and total_score > 0.65:
+            best_score = total_score
+            best_match = song
+
+    return best_match

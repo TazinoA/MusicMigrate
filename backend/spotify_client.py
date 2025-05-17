@@ -52,7 +52,7 @@ def get_songs(playlists):
                     continue
                 data = {
                     "song": track["name"],
-                    "artist": track["artists"][0]["name"],
+                    "artists": [artist["name"] for artist in track["artists"]],
                     "album": track["album"]["name"],
                     "duration": track["duration_ms"]
                 }
