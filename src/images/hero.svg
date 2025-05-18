@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="400" height="400">
+  <!-- Main circle background -->
+  <circle cx="200" cy="200" r="150" fill="#1F2937" />
+  
+  <!-- Spotify (top-left) -->
+  <g transform="translate(50, 50)">
+    <circle cx="0" cy="0" r="32" fill="#1DB954" />
+    <circle cx="0" cy="0" r="32" fill="#1DB954" opacity="0.2" filter="blur(8px)" />
+    <g fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" transform="translate(-16, -16) scale(1.3)">
+      <circle cx="12" cy="12" r="10" />
+      <path d="M8 14.5c2.5-1 5.5-1 8 0" />
+      <path d="M6.5 12c3.5-1 7.5-1 11 0" />
+      <path d="M8 9.5c2.5-1 5.5-1 8 0" />
+    </g>
+  </g>
+  
+  <!-- Apple Music (top-right) -->
+  <g transform="translate(350, 50)">
+    <defs>
+      <linearGradient id="appleGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#FB233B" />
+        <stop offset="100%" stop-color="#FB5183" />
+      </linearGradient>
+    </defs>
+    <circle cx="0" cy="0" r="32" fill="url(#appleGradient)" />
+    <circle cx="0" cy="0" r="32" fill="#FB233B" opacity="0.2" filter="blur(8px)" />
+    <g fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" transform="translate(-16, -16) scale(1.3)">
+      <circle cx="12" cy="12" r="10" />
+      <path d="M9 17V7h4a4 4 0 1 1 0 8h-4" />
+    </g>
+  </g>
+  
+  <!-- YouTube Music (bottom-left) -->
+  <g transform="translate(50, 350)">
+    <circle cx="0" cy="0" r="32" fill="#FF0000" />
+    <circle cx="0" cy="0" r="32" fill="#FF0000" opacity="0.2" filter="blur(8px)" />
+    <g fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" transform="translate(-16, -16) scale(1.3)">
+      <path d="M2 8a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2z" />
+      <path d="m10 15 5-3-5-3z" />
+    </g>
+  </g>
+  
+  <!-- Amazon Music (bottom-right) -->
+  <g transform="translate(350, 350)">
+    <circle cx="0" cy="0" r="32" fill="#00A8E1" />
+    <circle cx="0" cy="0" r="32" fill="#00A8E1" opacity="0.2" filter="blur(8px)" />
+    <g fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" transform="translate(-16, -16) scale(1.3)">
+      <path d="M20 16c-1.56 0-3.04-.42-4.3-1.16A12.8 12.8 0 0 1 4 6a4 4 0 0 0 1.5 3M4 16v-2a2 2 0 0 1 2-2h2" />
+      <circle cx="9" cy="16" r="3" />
+      <path d="m15 8 2 2 2-2" />
+      <path d="M17 10v6" />
+    </g>
+  </g>
+  
+  <!-- Central refresh icon -->
+  <g transform="translate(200, 200)">
+    <circle cx="0" cy="0" r="48" fill="#9333EA" />
+    <circle cx="0" cy="0" r="48" fill="#A855F7" opacity="0.3" filter="blur(8px)" />
+    <g fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M23 4v6h-6" />
+      <path d="M1 20v-6h6" />
+      <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15" />
+    </g>
+  </g>
+</svg>

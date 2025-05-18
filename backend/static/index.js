@@ -23,6 +23,7 @@ playlists.forEach(playlist => {
 })
 
 function handleSubmit(){
+    
     if(selected.size === 0){
         return
     }
