@@ -21,10 +21,12 @@ function App(){
         <Header />
        <main className = "content">
          <div className = "title">
-            <h1>Transfer Your Music Playlists Between Platforms</h1>
-            <p>Easily move your playlists between Spotify, Apple Music, YouTube Music, and more with just a few clicks.</p>
-            <button>Start Transferring</button>
-            <img src = {hero}></img>
+            <div className = "title-left-section">
+                <h1>Transfer Your Music Playlists Between Platforms</h1>
+                <p>Easily move your playlists between Spotify, Apple Music, YouTube Music, and more with just a few clicks.</p>
+                <button>Start Transferring →</button>
+            </div>
+           <div className = "title-right-section"> <img src = {hero}></img></div>
          </div>
          <div className = "platform-title">
             <h2>Supported Platforms</h2>

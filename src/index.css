@@ -5,7 +5,10 @@ body {
   font-family: 'Segoe UI', sans-serif;
   background-color: #030712;
   color: #333;
+  width: 100%;
 }
+
+
 
 .header {
   display: flex;
@@ -19,6 +22,7 @@ body {
   display: flex;
   height: 60px;
   margin-left: 10px;
+  font-size: 1.25rem;
 }
 
 .header-right-section{
@@ -27,6 +31,7 @@ body {
   color: white;
   gap: 10px;
   align-items: center;
+  font-size: 0.875rem;
 }
 .header-right-section > button{
   border: none;
@@ -52,11 +57,13 @@ body {
 }
 .platform-title > h2{
   margin-bottom: 0;
+  font-size: 3rem;
 }
 
 .platform-title > p{
   margin-top: 0;
-  color: #9CA3AF
+  color: #9CA3AF;
+  font-size: 1.25rem;
 }
 
 .app {
@@ -68,28 +75,37 @@ body {
 }
 
 .content {
-  flex: 1;
-  padding: 40px 20px;
-  max-width: 1000px;
   width: 100%;
 }
 .title{
-  border: 3px solid white;
+  padding-top: 6rem;
   width: 100%;
+  display: grid;
+  grid-template-columns: 1fr 400px;
 }
 
-.title > h1{
-  text-align: center;
-  font-size: 2rem;
+.title-left-section{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  margin-left: 100px;
+}
+
+.title h1{
+  font-size: 3.75rem;
   color:white;
+  margin-bottom: 0;
 }
 
-.title > p{
+.title  p{
   color: white;
-  text-align: center;
+  font-size: 1.25rem;
+  margin-top:0;
+  max-width: 600px;
+  color: #9CA3AF;
 }
 
-.title > button{
+.title  button{
   color: white;
   background-color: #9333EA;
   border-radius: 15px;
@@ -115,13 +131,14 @@ body {
   align-items: center;
   justify-content: center;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
-  color:#D1D5DB
+  color:#D1D5DB;
+  font-size: 0.875rem;
 }
 
 .card img {
   width: 100%;
-  max-width: 100px;
-  max-height: 100px;
+  max-width: 80px;
+  max-height: 80px;
   object-fit: contain;
   border-radius: 50%;
 }
