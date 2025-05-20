@@ -77,27 +77,27 @@ body {
 .content {
   width: 100%;
 }
-.title{
+.hero{
   padding-top: 6rem;
   width: 100%;
   display: grid;
   grid-template-columns: 1fr 400px;
 }
 
-.title-left-section{
+.hero-left-section{
   display: flex;
   flex-direction: column;
   justify-content: center;
   margin-left: 100px;
 }
 
-.title h1{
+.hero h1{
   font-size: 3.75rem;
   color:white;
   margin-bottom: 0;
 }
 
-.title  p{
+.hero  p{
   color: white;
   font-size: 1.25rem;
   margin-top:0;
@@ -105,7 +105,7 @@ body {
   color: #9CA3AF;
 }
 
-.title  button{
+.hero  button{
   color: white;
   background-color: #9333EA;
   border-radius: 15px;
@@ -146,4 +146,29 @@ body {
 .card:hover {
   transform: translateY(-5px);
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
+}
+
+.card.spotify {
+  background-color: #1DB954;
+  color: white;
+}
+
+.card.apple-music {
+  background: linear-gradient(to bottom right, #FB233B, #FB5183);
+  color: white;
+}
+
+.card.youtube-music {
+  background-color: #FF0000;
+  color: white;
+}
+
+.card.amazon-music {
+  background-color: #00A8E1;
+  color: white;
+}
+
+.card.deezer {
+  background-color: #00C7F2;
+  color: white;
 }

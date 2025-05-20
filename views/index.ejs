@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MusicMigrate</title>
+  <link rel="stylesheet" href="/index.css">
+</head>
+<body>
+  <!-- Header Section -->
+  <header class="header">
+    <div class="header-left-section">
+      <!-- <img class="logo" src="/images/logo.svg" alt="MusicMigrate Logo"> -->
+      <h2>MusicMigrate</h2>
+    </div>
+    <div class="header-right-section">
+      <p>Features</p>
+      <p>How it Works</p>
+      <button>Get Started</button>
+    </div>
+  </header>
+
+  <main class="content">
+
+    <div class="hero">
+      <div class="hero-left-section">
+        <h1>Transfer Your Music Playlists Between Platforms</h1>
+        <p>Easily move your playlists between Spotify, Apple Music, YouTube Music, and more with just a few clicks.</p>
+        <button>Start Transferring →</button>
+      </div>
+      <div class="hero-right-section">
+        <img src="/images/hero.svg" alt="Hero Image">
+      </div>
+    </div>
+
+   
+    <div class="platform-title">
+      <h2>Supported Platforms</h2>
+      <p>Transfer your playlists between major music streaming services</p>
+    </div>
+
+    
+   <div class="card-container">
+  <% cards.forEach((card) => { %>
+    <div class="card <%= card.class %>">
+      <img src="<%= card.logo %>" alt="<%= card.name %>">
+      <p><%= card.name %></p>
+    </div>
+  <% }) %>
+</div>
+  </main>
+  <script src = "/main.js"></script>
+</body>
+</html>
