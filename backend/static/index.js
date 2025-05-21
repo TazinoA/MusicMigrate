@@ -64,3 +64,27 @@ function handleSubmit(){
     }).finally(hideLoadingOverlay)
     showLoadingOverlay();
 }
+
+
+const source = new EventSource("/progress-stream");
+
+  source.onmessage = function(event) {
+    const data = JSON.parse(event.data);
+    
+    
+    document.querySelector(".loading-overlay").style.display = "flex";
+
+    
+    document.querySelector(".current-playlist").textContent = `Transferring: ${data.playlist}`;
+
+    
+    const percentage = Math.floor((data.currCount / data.total) * 100);
+    document.querySelector(".progress-percentage").textContent = `${percentage}%`;
+
+    
+    document.querySelector(".progress-fill").style.width = `${percentage}%`;
+
+    
+    document.querySelectorAll(".stat-value")[0].textContent = `${data.currPlaylist}/${data.totalPlaylists}`;
+    document.querySelectorAll(".stat-value")[1].textContent = `${data.currCount}/${data.totalSongs}`;
+  };

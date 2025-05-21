@@ -286,9 +286,6 @@ h1 {
   line-height: 1.4;
 }
 
-/* Loading Animation Styles - Add to your existing styles.css */
-
-/* Loading Overlay */
 .loading-overlay {
   position: fixed;
   top: 0;
@@ -303,14 +300,13 @@ h1 {
   padding: 2rem;
 }
 
-/* Loading Container */
+
 .loading-container {
   max-width: 500px;
   width: 100%;
   text-align: center;
 }
 
-/* Loading Animation */
 .loading-animation {
   margin-bottom: 2rem;
   height: 120px;
@@ -319,7 +315,6 @@ h1 {
   align-items: center;
 }
 
-/* Music Note Animation */
 .music-note-animation {
   display: flex;
   align-items: flex-end;
@@ -364,7 +359,7 @@ h1 {
   }
 }
 
-/* Loading Text */
+
 .loading-title {
   font-size: 1.75rem;
   font-weight: 700;
@@ -378,7 +373,7 @@ h1 {
   margin-bottom: 2rem;
 }
 
-/* Progress Bar */
+
 .progress-container {
   margin-bottom: 2rem;
 }
@@ -393,7 +388,7 @@ h1 {
 
 .progress-fill {
   height: 100%;
-  width: 45%; /* Set dynamically with JavaScript */
+  width: 45%; 
   background-color: var(--primary-color);
   border-radius: 4px;
   animation: progressPulse 2s infinite;
@@ -426,7 +421,7 @@ h1 {
   font-weight: 600;
 }
 
-/* Transfer Stats */
+
 .transfer-stats {
   display: flex;
   justify-content: center;
@@ -450,7 +445,7 @@ h1 {
   margin-top: 0.25rem;
 }
 
-/* Responsive Adjustments */
+
 @media (max-width: 480px) {
   .loading-title {
     font-size: 1.5rem;

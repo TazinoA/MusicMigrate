@@ -80,16 +80,23 @@ def add_ytSongs(playlists, progress_callback = None):
     print("start")
     client = get_ytClient()
     could_not_find = {}
-
-
+    total_songs = sum([len(songs) for _, songs in playlists])
+    total_playlists = len(playlists)
     for playlist_name, songs in playlists:
         could_not_find[playlist_name] = []
         playlist_id = create_playlist(playlist_name)
         video_ids = set()
 
+       
+        total = len(songs)
+        curr_count = 0
+        curr_playlist = 1
         for track in songs:
+            current_song = track["song"]
+            curr_count += 1
+            progress_callback(playlist_name = playlist_name, current_song = current_song, total = total, curr_count = curr_count, curr_playlist = curr_playlist, total_songs = total_songs, total_playlists = total_playlists)
+
             search_artists = ' '.join([a for a in track["artists"] if isinstance(a, str) and a.strip()])
-            #print(track["song"])
             result = client.search(query = f"{track['song']} {search_artists}", filter="songs", limit=5)[:5]
 
             matched_song = match_song(result, track)
@@ -119,6 +126,8 @@ def add_ytSongs(playlists, progress_callback = None):
         if video_ids:
             response = client.add_playlist_items(playlistId=playlist_id, videoIds=list(video_ids), duplicates=True)
             #print(response["status"])
+        
+        curr_playlist += 1
 
     return could_not_find
 
