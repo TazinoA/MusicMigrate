@@ -76,7 +76,7 @@ def clean_text(text):
     return text.strip()
 
 
-def add_ytSongs(playlists):
+def add_ytSongs(playlists, progress_callback = None):
     print("start")
     client = get_ytClient()
     could_not_find = {}

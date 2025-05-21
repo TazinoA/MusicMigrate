@@ -1,0 +1,7 @@
+{% for playlist in selectedPlaylists %}
+            <div class="selected-playlists-container">
+            <div class="selected-playlist-item">
+              <p>{{playlist.name}}</p>
+              <span class="track-count">{{playlist.count}} tracks</span>
+            </div>
+            {% endfor %}

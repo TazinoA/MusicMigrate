@@ -8,8 +8,6 @@ body {
   width: 100%;
 }
 
-
-
 .header {
   display: flex;
   align-items: center;
@@ -47,6 +45,8 @@ body {
   color: white;
 }
 
+
+
 .platform-title{
   display: flex;
   flex-direction: column;
@@ -82,6 +82,7 @@ body {
   width: 100%;
   display: grid;
   grid-template-columns: 1fr 400px;
+  background: linear-gradient(to bottom right, #111827, #030712);
 }
 
 .hero-left-section{
@@ -148,27 +149,74 @@ body {
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
 }
 
-.card.spotify {
+img.spotify {
   background-color: #1DB954;
   color: white;
 }
 
-.card.apple-music {
+img.apple-music {
   background: linear-gradient(to bottom right, #FB233B, #FB5183);
   color: white;
 }
 
-.card.youtube-music {
+img.youtube-music {
   background-color: #FF0000;
   color: white;
 }
 
-.card.amazon-music {
+img.amazon-music {
   background-color: #00A8E1;
   color: white;
 }
 
-.card.deezer {
+img.deezer {
   background-color: #00C7F2;
   color: white;
+}
+
+.how-it-works{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: white;
+  background-color: #111827;
+  padding: 50px 24px;
+}
+
+.how-it-works > h2{
+  margin: 0
+}
+
+.how-it-works  h3{
+  margin: 0
+}
+
+.how-it-works p{
+  margin-top: 0;
+  color: #9CA3AF;
+}
+
+.how-it-works > div{
+  display: flex;
+  width: 100%;
+  justify-content: center;
+  gap: 40px;
+}
+
+.how-it-works > div > div{
+  display: flex;
+  flex-direction: column;
+  width: 325px;
+  height: 164px;
+  justify-content: center;
+  gap: 10px;
+}
+
+.how-it-works img{
+  width: 64px;
+  height: 64px;
+  align-self: center;
+  border-radius: 50%;
+  background-color: #1F2937;
+  padding: 0.6rem;
 }

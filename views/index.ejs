@@ -7,7 +7,6 @@
   <link rel="stylesheet" href="/index.css">
 </head>
 <body>
-  <!-- Header Section -->
   <header class="header">
     <div class="header-left-section">
       <!-- <img class="logo" src="/images/logo.svg" alt="MusicMigrate Logo"> -->
@@ -33,7 +32,7 @@
       </div>
     </div>
 
-   
+   <div class = "platforms">
     <div class="platform-title">
       <h2>Supported Platforms</h2>
       <p>Transfer your playlists between major music streaming services</p>
@@ -42,12 +41,36 @@
     
    <div class="card-container">
   <% cards.forEach((card) => { %>
-    <div class="card <%= card.class %>">
-      <img src="<%= card.logo %>" alt="<%= card.name %>">
+    <div class="card">
+      <img class="<%= card.class %>" src="<%= card.logo %>" alt="<%= card.name %>">
       <p><%= card.name %></p>
     </div>
   <% }) %>
-</div>
+    </div>
+   </div>
+
+   <div class = "how-it-works">
+    <h2>How It Works</h2>
+    <p>Transfer your playlists in three simple steps</p>
+    <div>
+        <div>
+        <img src = "/images/source.svg"/>
+        <h3>Select Source</h3>
+        <p>Choose the platform you want to transfer playlists from</p>
+    </div>
+     <div>
+        <img src = "/images/arrow.svg"/>
+        <h3>Select Destination</h3>
+        <p>Choose where you want your playlists to go</p>
+    </div>
+     <div>
+        <img src = "/images/transfer.svg"/>
+        <h3>Transfer</h3>
+        <p>Click transfer and we'll handle the rest</p>
+    </div>
+    </div>
+   </div>
+
   </main>
   <script src = "/main.js"></script>
 </body>

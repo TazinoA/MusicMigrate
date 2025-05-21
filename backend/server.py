@@ -40,12 +40,19 @@ def display_playlists():
        result = get_songs(playlists)
        
        if isinstance(result, Response):
-           return result
+           return result, 400
        
        unfound = add_ytSongs(result)
        print(unfound)
-       return redirect("https://google.com")
+       return "success", 200
        
+
+@app.route("/update-selected", methods = ["POST"])
+def update():
+    data = request.get_json()
+    selected = data.get("selectedPlaylists")
+    return render_template("/partials/selected-playlists.html", selectedPlaylists=selected)
+
 
 
 if __name__ == "__main__":

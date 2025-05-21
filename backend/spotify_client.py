@@ -79,7 +79,8 @@ def get_playlists():
         playlists.append({
             "logo": url if url else "hello",
             "name": data["name"],
-            "id": data["id"]
+            "id": data["id"],
+            "count": data["tracks"]["total"]
         })
     return playlists
 
