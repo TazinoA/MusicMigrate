@@ -71,8 +71,8 @@ def clean_text(text):
     if not text:
         return ""
     text = text.lower()
-    text = re.sub(r"\(.*?\)|\[.*?\]|-.*", "", text)  # remove (extra), [extra], - versions
-    text = re.sub(r"[^\w\s]", "", text)  # remove punctuation
+    text = re.sub(r"\(.*?\)|\[.*?\]|-.*", "", text) 
+    text = re.sub(r"[^\w\s]", "", text) 
     return text.strip()
 
 
@@ -133,23 +133,20 @@ def add_ytSongs(playlists, progress_callback = None):
 
 
 def split_artists(name_str):
-    # Split on commas, ampersands (&), 'and', possibly with spaces around
     parts = re.split(r'\s*,\s*|\s*&\s*|\s+and\s+', name_str)
     return [part.strip() for part in parts if part.strip()]
 
 def get_result_artists(song):
     if "artists" in song:
         artists_list = song["artists"]
-        if len(artists_list) == 1:
-            # Single artist dict, possibly multiple names joined
+        if len(artists_list) == 1:   
             name_str = artists_list[0].get("name", "")
-            # If contains separators, split into multiple
+           
             if any(sep in name_str for sep in [",", "&", " and "]):
                 return [clean_text(a) for a in split_artists(name_str)]
             else:
                 return [clean_text(name_str)]
         else:
-            # Multiple artist dicts, extract normally
             return [clean_text(a.get("name", "")) for a in artists_list if a.get("name")]
     elif "artist" in song:
         return [clean_text(song["artist"])]
@@ -158,15 +155,12 @@ def get_result_artists(song):
     
 
 def extract_featured_artists(title):
-    # This will extract text inside parentheses or brackets with "feat" or "ft"
     featured_artists = []
     feat_pattern = re.compile(r"\(feat\.? ([^)]+)\)|\[feat\.? ([^\]]+)\]", re.IGNORECASE)
     matches = feat_pattern.findall(title)
     for match in matches:
-        # match is a tuple; only one group will have text
         feat_text = match[0] or match[1]
         if feat_text:
-            # Split by comma, &, and 'and'
             artists = re.split(r'\s*,\s*|\s*&\s*|\s+and\s+', feat_text)
             featured_artists.extend([a.strip() for a in artists if a.strip()])
     return featured_artists
@@ -177,9 +171,9 @@ def parse_duration(duration_str):
         return 0
     parts = duration_str.split(':')
     parts = [int(p) for p in parts]
-    if len(parts) == 2:  # mm:ss
+    if len(parts) == 2: 
         return parts[0] * 60 + parts[1]
-    elif len(parts) == 3:  # hh:mm:ss
+    elif len(parts) == 3: 
         return parts[0] * 3600 + parts[1] * 60 + parts[2]
     return 0
 
@@ -188,7 +182,7 @@ def match_song(results, track):
     target_title = clean_text(track["song"])
     target_artists = [clean_text(artist) for artist in track["artists"]]
 
-    # Extract featured artists from the target song title and add to target_artists
+
     featured_from_title = extract_featured_artists(track["song"])
     target_artists += [clean_text(a) for a in featured_from_title]
 
@@ -199,9 +193,8 @@ def match_song(results, track):
 
     for song in results:
         title = clean_text(song.get("title"))
-        result_artists = get_result_artists(song)  # Use your robust artist extraction
+        result_artists = get_result_artists(song)  
 
-        # Extract featured artists from YTM song title and add them
         featured_from_yt_title = extract_featured_artists(song.get("title", ""))
         result_artists += [clean_text(a) for a in featured_from_yt_title]
 

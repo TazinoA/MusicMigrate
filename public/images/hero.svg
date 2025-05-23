@@ -52,11 +52,13 @@
     </g>
   </g>
   
-  <!-- Central refresh icon -->
+  <!-- Central refresh icon (fixed) -->
   <g transform="translate(200, 200)">
     <circle cx="0" cy="0" r="48" fill="#9333EA" />
     <circle cx="0" cy="0" r="48" fill="#A855F7" opacity="0.3" filter="blur(8px)" />
-    <g fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+    
+    <!-- Larger, centered refresh icon -->
+    <g fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" transform="scale(1.8) translate(-12, -12)">
       <path d="M23 4v6h-6" />
       <path d="M1 20v-6h6" />
       <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15" />

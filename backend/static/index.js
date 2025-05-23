@@ -6,6 +6,12 @@ document.querySelector(".transfer-button").addEventListener("click", handleSubmi
 
 const loadingOverlay = document.querySelector('.loading-overlay');
 
+playlists.forEach(playlist => {
+    playlist.addEventListener("click",() => {
+        handleClick(playlist)
+    })
+})
+
 function showLoadingOverlay() {
   loadingOverlay.style.display = 'flex'; 
 }
@@ -32,6 +38,7 @@ function handleClick(playlist){
   name,
   count,
 }));
+
     fetch('/update-selected', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -43,12 +50,6 @@ function handleClick(playlist){
   });
 
 }
-
-playlists.forEach(playlist => {
-    playlist.addEventListener("click",() => {
-        handleClick(playlist)
-    })
-})
 
 function handleSubmit(){
     if(selected.size === 0){

@@ -1,7 +1,7 @@
-let cards = document.querySelectorAll(".card");
+const platforms = document.querySelectorAll(".platform");
 
-cards.forEach(card => {
-    card.addEventListener("click", () => {
-        window.location.href = "http://127.0.0.1:8000"
+platforms.forEach(platform => {
+    platform.addEventListener("click", () => {
+        platform.classList.toggle("selected");
     })
-});
+})
