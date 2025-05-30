@@ -58,26 +58,17 @@
     color: #9CA3AF;
 }
 
-
 .source-name{
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border: 3px solid white;
-    width: 100%
-}
-
-.source-name > p{
     color: white;
     font-size: large;
     font-weight: 600;
 }
 
-.source-name > img{
-  width: 20px; 
-  height: 20px; 
-  filter: brightness(0) saturate(100%) invert(42%) sepia(93%) saturate(1352%) hue-rotate(87deg) brightness(119%) contrast(119%);
+.selected > .source-name::after{
+    content: "✔";
+    color: #22C55E;
 }
+
 
 .source-platforms img {
   width: 100%;
@@ -100,6 +91,7 @@ button{
 .content > p{
     margin-top: 30px;
     color: #9CA3AF;
+    margin-bottom: 50px;;
 }
 
 a{

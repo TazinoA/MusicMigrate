@@ -2,9 +2,19 @@ import axios from "https://esm.sh/axios"
 
 let playlists = document.querySelectorAll(".playlist");
 let selected = new Map();
-document.querySelector(".transfer-button").addEventListener("click", handleSubmit)
-
 const loadingOverlay = document.querySelector('.loading-overlay');
+document.querySelector(".choose-destination").addEventListener("click", handleSubmit);
+
+document.querySelector(".select-all").addEventListener("click",async() => {
+ for(const playlist of playlists){
+  playlist.click();
+  await sleep(10);
+ }
+})
+
+function sleep(ms){return new Promise(resolve => setTimeout(resolve, ms));}
+
+
 
 playlists.forEach(playlist => {
     playlist.addEventListener("click",() => {

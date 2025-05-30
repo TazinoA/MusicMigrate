@@ -27,12 +27,9 @@
 
     <div class = "source-platforms">
          <% cards.forEach((card) => { %>
-    <div class="platform">
+    <div class="platform" id = "{{card.name}}">
       <img class="<%= card.class %>" src="<%= card.logo %>" alt="<%= card.name %>">
-      <div class = "source-name">
-        <p><%= card.name %> </p>
-        <img src = "/images/tick.svg"/>
-      </div>
+        <p class = "source-name"><%= card.name %> </p>
       <p>Transfer playlists from <%= card.name %></p>
     </div>
   <% }) %>

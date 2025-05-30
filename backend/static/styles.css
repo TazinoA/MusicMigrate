@@ -262,7 +262,7 @@ h1 {
   font-size: 0.8rem;
 }
 
-.transfer-button {
+.select-all {
   background-color: var(--primary-color);
   color: white;
   border: none;
@@ -275,7 +275,7 @@ h1 {
   width: 100%;
 }
 
-.transfer-button:hover {
+.select-all:hover {
   background-color: var(--primary-hover);
 }
 

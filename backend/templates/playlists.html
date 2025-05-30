@@ -3,92 +3,86 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="../static/styles.css"/>
+    <link rel="stylesheet" href="../static/index.css"/>
+    <link rel="stylesheet" href="../static/transfer.css"/>
     <title>MusicMigrate</title>
 </head>
 <body>
-  <header class="header">
-    <div class="header-left-section">
-      <h2>MusicMigrate</h2>
-    </div>
-    <div class="header-right-section">
-      <p>Features</p>
-      <p>How it Works</p>
-      <button>Get Started</button>
-    </div>
-  </header>
-  <h1>Select Playlists</h1>
-  <div class="content-container">
-    <div class="items">
-      <h2>Your Playlists</h2>
-      <div class="playlist-items">
-        {% for playlist in playlists %}
-        <div class="playlist" id="{{playlist.id}}" name="{{playlist.name}}" count = "{{playlist.count}}">
-          <img src="{{ playlist.logo }}" alt="{{ playlist.name }}">
-          <div>
-            <p>{{ playlist.name }}</p>
-              <span class="music-symbol">♪</span>
-              <span class = "track-count">{{playlist.count}} tracks</span>
+    <header class="header">
+      <div class="header-left-section">
+        <h2>MusicMigrate</h2>
+      </div>
+      <div class="header-right-section">
+        <p>Home</p>
+        <p>Contact</p>
+      </div>
+    </header>
+
+    <main>
+      <div class="title">
+        <h1>Transfer Your Playlists</h1>
+        <p>Select the playlists you want to transfer between music platforms</p>
+      </div>
+
+      <div class="container">
+        <div class="select-platforms">
+          <h3>Select Platforms</h3>
+          <div class="select-source">
+            <p>Source Platform</p>
+            <select name="source">
+              <option value="" hidden disabled selected>Select source platform</option>
+              {% for card in cards %}
+                <option value="{{ card.name }}">{{ card.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <button disabled>Connect to Platform</button>
+          <div class="select-destination hidden">
+            <p>Destination Platform</p>
+            <select name="destination">
+              <option value="" hidden disabled selected>Select destination platform</option>
+              {% for card in cards %}
+                <option value="{{ card.name }}">{{ card.name }}</option>
+              {% endfor %}
+            </select>
           </div>
         </div>
-        {% endfor %}
-      </div>
-    </div>
-    
-    <div class="transfer-details">
-      <h3>Transfer Details</h3>
-      <div class="transfer-details-content">
-        <div>
-          <label>Selected Playlists</label>
-            <div id = "section">
-              {% include 'partials/selected-playlists.html' %}
-            </div>
+
+        <div class="pre-connect">
+          <h2>Connect to a Music Platform</h2>
+          <p>Select a source platform and connect your account to view your playlists</p>
+          <button disabled>Connect to platform</button>
+        </div>
+
+        <div class="transfer-details hidden">
+          <h3>Transfer Summary</h3>
+          <p>Selected Playlists: <span>0</span></p>
+          <p>Total Tracks: <span>0</span></p>
+          <button>→ Start Transfer</button>
+        </div>
+
+        <div class="display-playlists hidden">
+          <div class="display-playlists-header">
+            <h3>Your playlists <span>from Spotify</span></h3>
+            <button>Select All</button>
+            <input type="text" placeholder="Search playlists...">
+          </div>
+          <div class="playlists">
+            {% for playlist in playlists %}
+              <div class="playlist" id="{{ playlist.id }}" name="{{ playlist.name }}" count="{{ playlist.count }}">
+                <img src="{{ playlist.logo }}" alt="{{ playlist.name }}">
+                <div>
+                  <p>{{ playlist.name }}</p>
+                  <span class="music-symbol">♪</span>
+                  <span class="track-count">{{ playlist.count }} tracks</span>
+                </div>
+              </div>
+            {% endfor %}
           </div>
         </div>
-        <button class="transfer-button">Choose Destination</button>
-        <div class="helper-text">
-          This will copy your playlists to the destination platform. Your original playlists will remain untouched.
-        </div>
       </div>
-    </div>
+    </main>
 
-  <div class="loading-overlay" style = "display:none">
-    <div class="loading-container">
-      <div class="loading-animation">
-        <div class="music-note-animation">
-          <span></span>
-          <span></span>
-          <span></span>
-          <span></span>
-        </div>
-      </div>
-      <h2 class="loading-title">Transferring Your Playlists</h2>
-      <p class="loading-description">Please wait while we move your music. This may take a few minutes.</p>
-      
-      <div class="progress-container">
-        <div class="progress-bar">
-          <div class="progress-fill"></div>
-        </div>
-        <div class="progress-text">
-          <span class="current-playlist">Transferring: Chill Vibes</span>
-          <span class="progress-percentage">45%</span>
-        </div>
-      </div>
-      
-      <div class="transfer-stats">
-        <div class="stat-item">
-          <div class="stat-value">2/5</div>
-          <div class="stat-label">Playlists</div>
-        </div>
-        <div class="stat-item">
-          <div class="stat-value">48/112</div>
-          <div class="stat-label">Songs</div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  </div>
-  <script type="module" src="../static/index.js"></script>
+    <script src="/main.js"></script>    
 </body>
 </html>

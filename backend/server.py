@@ -73,7 +73,7 @@ def progress_callback(playlist_name, current_song, curr_count, total, total_song
 def progress_stream():
     def event_stream():
         while True:
-            data = event_queue.get()  # Waits for new progress data
+            data = event_queue.get()
             yield f"data: {json.dumps(data)}\n\n"
     return Response(stream_with_context(event_stream()), mimetype="text/event-stream")
 
