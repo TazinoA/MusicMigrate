@@ -6,7 +6,7 @@ from spotify_client import *
 from flask_cors import CORS
 from ytMusic_client import *
 import queue
-
+import json
 
 app = Flask(__name__)
 CORS(app)
@@ -35,7 +35,10 @@ def redirect_page():
 def display_playlists():
    if request.method == "GET":
        data = get_playlists()
-       return render_template("playlists.html", playlists = data)
+       path = os.path.join(app.static_folder, "cards.json")
+       with open(path) as f:
+           cards = json.load(f)
+       return render_template("playlists.html", playlists = data, cards=cards)
    else:
        data = request.get_json()
        playlists = data.get("playlists")

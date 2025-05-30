@@ -65,7 +65,6 @@ main {
   grid-template-columns: 1fr 3fr;
   grid-template-rows: 1fr 1fr;
   gap: var(--grid-gap);
-  border: 3px solid white;
 }
 
 .select-platforms {
@@ -276,7 +275,7 @@ main {
   color: var(--text-primary);
 }
 
-.display-playlists input {
+.search-bar{
   width: calc(100% - 3rem);
   margin: 0 var(--card-padding) 1rem var(--card-padding);
   padding: 0.75rem;
@@ -292,22 +291,240 @@ main {
   background-size: 1rem 1rem;
 }
 
-.display-playlists input:focus {
+.search-bar:focus {
   outline: none;
   border-color: var(--accent);
   box-shadow: 0 0 0 2px rgba(147, 51, 234, 0.2);
 }
 
-.display-playlists input::placeholder {
+.search-bar::placeholder {
   color: var(--text-tertiary);
 }
 
 .playlists {
   max-height: 500px;
-  overflow-y: auto;
+  overflow-y: scroll;
+  overflow-x: hidden;
   padding: 0.25rem;
-  display:table;
+  display:flex;
+  flex-direction: column;
+  width:100%;
 }
+
+.playlist{
+  width: 100%;
+  display:flex;
+  padding: 1rem;
+  align-items:center;
+  gap: 0.5rem;
+}
+
+.playlist:hover{
+  background-color:var(--border-color) ;
+}
+
+.playlist>div>span{
+  color: var(--text-secondary);
+}
+
+.playlist>img{
+  height:80%;
+  width:3rem;
+  object-fit: cover;
+  display:block;
+}
+
+.checkbox{
+  accent-color: var(--accent);
+}
+
+.loading-overlay {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 50%;
+  height: 50%;
+  backdrop-filter: blur(8px);
+  background-color: #121e36;
+  z-index: 1000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem;
+}
+
+
+.loading-container {
+  max-width: 500px;
+  width: 100%;
+  text-align: center;
+}
+
+.loading-animation {
+  margin-bottom: 2rem;
+  height: 120px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.music-note-animation {
+  display: flex;
+  align-items: flex-end;
+  height: 80px;
+  gap: 0.5rem;
+}
+
+.music-note-animation span {
+  display: block;
+  width: 10px;
+  background-color:#a855f7;
+  border-radius: 4px;
+  animation: musicBars 1.5s infinite ease-in-out;
+}
+
+.music-note-animation span:nth-child(1) {
+  height: 20px;
+  animation-delay: 0.2s;
+}
+
+.music-note-animation span:nth-child(2) {
+  height: 40px;
+  animation-delay: 0.4s;
+}
+
+.music-note-animation span:nth-child(3) {
+  height: 60px;
+  animation-delay: 0.6s;
+}
+
+.music-note-animation span:nth-child(4) {
+  height: 30px;
+  animation-delay: 0.8s;
+}
+
+@keyframes musicBars {
+  0%, 100% {
+    transform: scaleY(1);
+  }
+  50% {
+    transform: scaleY(0.6);
+  }
+}
+
+
+.loading-title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin-bottom: 0.75rem;
+  color:#fafafa;
+}
+
+.loading-description {
+  font-size: 1rem;
+  color: #a1a1aa;
+  margin-bottom: 2rem;
+}
+
+
+.progress-container {
+  margin-bottom: 2rem;
+}
+
+.progress-bar {
+  height: 8px;
+  background-color: #1e2c4a;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 0.75rem;
+}
+
+.progress-fill {
+  height: 100%;
+  width: 45%; 
+  background-color:#a855f7;
+  border-radius: 4px;
+  animation: progressPulse 2s infinite;
+}
+
+@keyframes progressPulse {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.progress-text {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.875rem;
+}
+
+.current-playlist {
+  color: #fafafa;
+}
+
+.progress-percentage {
+  color: #a855f7;
+  font-weight: 600;
+}
+
+
+.transfer-stats {
+  display: flex;
+  justify-content: center;
+  gap: 3rem;
+  margin-top: 2rem;
+}
+
+.stat-item {
+  text-align: center;
+}
+
+.stat-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #fafafa;
+}
+
+.stat-label {
+  font-size: 0.875rem;
+  color: #a1a1aa;
+  margin-top: 0.25rem;
+}
+
+.backdrop {
+  position: fixed;
+  inset: 0; 
+  background-color: rgba(0, 0, 0, 0.4); 
+  backdrop-filter: blur(4px); 
+  z-index: 999;
+}
+
+@media (max-width: 480px) {
+  .loading-title {
+    font-size: 1.5rem;
+  }
+  
+  .loading-description {
+    font-size: 0.875rem;
+  }
+  
+  .transfer-stats {
+    gap: 2rem;
+  }
+  
+  .stat-value {
+    font-size: 1.25rem;
+  }
+}
+
 
 @media (min-width: 768px) {
   :root {

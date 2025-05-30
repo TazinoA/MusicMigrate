@@ -36,7 +36,7 @@
               {% endfor %}
             </select>
           </div>
-          <button disabled>Connect to Platform</button>
+          <button disabled class = "connect">Connect to Platform</button>
           <div class="select-destination hidden">
             <p>Destination Platform</p>
             <select name="destination">
@@ -51,38 +51,76 @@
         <div class="pre-connect">
           <h2>Connect to a Music Platform</h2>
           <p>Select a source platform and connect your account to view your playlists</p>
-          <button disabled>Connect to platform</button>
+          <button disabled class = "connect">Connect to platform</button>
         </div>
 
         <div class="transfer-details hidden">
           <h3>Transfer Summary</h3>
-          <p>Selected Playlists: <span>0</span></p>
-          <p>Total Tracks: <span>0</span></p>
-          <button>→ Start Transfer</button>
+          <p>Selected Playlists: <span id = "playlist-count">0</span></p>
+          <p>Total Tracks: <span id = "track-count">0</span></p>
+          <button id = "transfer-button">Start Transfer →</button>
         </div>
 
         <div class="display-playlists hidden">
           <div class="display-playlists-header">
-            <h3>Your playlists <span>from Spotify</span></h3>
-            <button>Select All</button>
-            <input type="text" placeholder="Search playlists...">
+            <h3>Your playlists <span id = "current-source">from Spotify</span></h3>
+            <button id = "select-all">Select All</button>
+            <input type="text" placeholder="Search playlists..." class = "search-bar">
           </div>
           <div class="playlists">
-            {% for playlist in playlists %}
-              <div class="playlist" id="{{ playlist.id }}" name="{{ playlist.name }}" count="{{ playlist.count }}">
-                <img src="{{ playlist.logo }}" alt="{{ playlist.name }}">
-                <div>
-                  <p>{{ playlist.name }}</p>
-                  <span class="music-symbol">♪</span>
-                  <span class="track-count">{{ playlist.count }} tracks</span>
-                </div>
-              </div>
-            {% endfor %}
+          {% for playlist in playlists %}
+            <label class="playlist" for="playlist-{{ playlist.id }}">
+            <input type="checkbox" name="{{playlist.name}}" value="{{ playlist.count }}" id="playlist-{{ playlist.id }}" data-id = "{{playlist.id}}"class="checkbox">
+            <img src="{{ playlist.logo }}" alt="{{ playlist.name }}">
+          <div>
+            <p>{{ playlist.name }}</p>
+            <span class="music-symbol">♪</span>
+            <span class="track-count">{{ playlist.count }} tracks</span>
           </div>
+        </label>
+        {% endfor %}
+        </div>
         </div>
       </div>
     </main>
 
-    <script src="/main.js"></script>    
+    <div class = "backdrop" style = "display:none"></div>
+    <div class="loading-overlay" style = "display:none">
+    <div class="loading-container">
+      <div class="loading-animation">
+        <div class="music-note-animation">
+          <span></span>
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+      </div>
+      <h2 class="loading-title">Transferring Your Playlists</h2>
+      <p class="loading-description">Please wait while we move your music. This may take a few minutes.</p>
+      
+      <div class="progress-container">
+        <div class="progress-bar">
+          <div class="progress-fill"></div>
+        </div>
+        <div class="progress-text">
+          <span class="current-playlist">Transferring:</span>
+          <span class="progress-percentage">0%</span>
+        </div>
+      </div>
+      
+      <div class="transfer-stats">
+        <div class="stat-item">
+          <div class="stat-value">0/0</div>
+          <div class="stat-label">Playlists</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value">0/0</div>
+          <div class="stat-label">Songs</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+    <script type = "module" src="../static/main.js"></script>    
 </body>
 </html>

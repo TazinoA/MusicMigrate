@@ -75,9 +75,12 @@ def get_playlists():
     playlists = []
 
     for data in response["items"]:
-        url = data["images"][0]["url"]
+        if data.get("images") and len(data["images"]) > 1:
+            url = data["images"][0]["url"]
+        else:
+            url = "https://kzmk6dbvewv371frmiwy.lite.vusercontent.net/placeholder.svg?height=60&width=60"
         playlists.append({
-            "logo": url if url else "hello",
+            "logo": url,
             "name": data["name"],
             "id": data["id"],
             "count": data["tracks"]["total"]
