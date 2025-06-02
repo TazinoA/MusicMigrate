@@ -48,8 +48,14 @@ def display_playlists():
            return result, 400
        
        unfound = add_ytSongs(result, progress_callback)
-       print(unfound)
-       return "success", 200
+       session["results"] = unfound
+       return redirect(url_for("results"))
+   
+
+@app.route("/results")
+def results():
+    results = session.get("results", [])
+    return render_template("results.html")
        
 
 @app.route("/update-selected", methods = ["POST"])

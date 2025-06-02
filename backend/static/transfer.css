@@ -1,7 +1,7 @@
 * {
   margin: 0;
   padding: 0;
-  
+  box-sizing: border-box;
 }
 
 :root {
@@ -344,7 +344,7 @@ main {
   left: 50%;
   transform: translate(-50%, -50%);
   width: 50%;
-  height: 50%;
+  height: 60%;
   backdrop-filter: blur(8px);
   background-color: #121e36;
   z-index: 1000;

@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../static/index.css"/>
+    <link rel="stylesheet" href="../static/results.css"/>
+    <title>MusicMigrate</title>
+</head>
+<body>
+    <header class="header">
+      <div class="header-left-section">
+        <h2>MusicMigrate</h2>
+      </div>
+      <div class="header-right-section">
+        <p>Home</p>
+        <p>Contact</p>
+      </div>
+    </header>
+
+    <main class = "content">
+        <div class = "title">
+            <img/>
+            <h1>Playlist Transfer Results</h1>
+        </div>
+        <p>Review songs that couldn't be transferred to your destination platform</p>
+        <div class = "playlist-breakdown">
+            <div class = "breakdown-title">
+                <span class = "source">Spotify</span>
+                <span>→</span>
+                <span class = "destination">YoutubeMusic</span>
+            </div>
+            <p>3 Playlists</p>
+            <div class = "total-summary">
+                <div>
+                    <span>239</span>
+                    <p>Total songs</p>
+                </div>
+                <div>
+                    <span class = "success">201</span>
+                    <p>Successfully Transfered</p>
+                </div>
+                <div>
+                    <span class = "failed">38</span>
+                    <p>Failed to Transfer</p>
+                </div>
+            </div>
+            <h3>Playlist Breakdown:</h3>
+            {% for _ in range(5) %}
+                <div class="playlist">
+                    <span></span>
+                    <h4>My Favourite Hits 2024</h4>
+                    <div>
+                        <p class="success">98✓</p>
+                        <p class="failed">29✗</p>
+                        <p>127 total</p>
+                    </div>
+                </div>
+            {% endfor %}
+
+        </div>
+        <div class = "explanation">
+            <p>Some songs couldn't be transferred due to platform restrictions or availability issues.You can export the list for manual review.</p>
+        </div>
+        <div class = "search-functionality">
+           <input type="text" placeholder="Search failed songs..." class = "search-bar">
+           <select>
+            <option value = "all">All Playlists</option>
+            <option value = "running">Running</option>
+            <option value = "p">P</option>
+            <option value = "test">test</option>
+           </select>
+           <button>⤓ Export List</button>
+        </div>
+        <div class = "songs-display">
+            <div id = "display-title">
+                <h4>Songs That Couldn't Be Transferred</h4>
+                <p>8 of 8 songs shown</p>
+            </div>
+           {% for _ in range(10) %}
+                <div class="song">
+                    <div class="song-icon">
+                        <span>♫</span>
+                    </div>
+                    <div class="song-info">
+                        <h3 class="song-title">1999</h3>
+                        <p class="artist">Sleepy Hallow</p>
+                        <div class="song-meta">
+                            <div class="playlist-indicator">
+                                <span class="playlist-dot"></span>
+                                <span class="playlist-name">My Favourite Hits 2024</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+
+        </div>
+    </main> 
+</body>
+</html>
