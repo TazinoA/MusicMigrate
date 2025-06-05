@@ -83,7 +83,8 @@ def add_ytSongs(playlists, progress_callback = None):
     total_songs = sum([len(songs) for _, songs in playlists])
     total_playlists = len(playlists)
     for playlist_name, songs in playlists:
-        could_not_find[playlist_name] = []
+        could_not_find[playlist_name] = [0]
+        could_not_find[playlist_name][0] = len(songs)
         playlist_id = create_playlist(playlist_name)
         video_ids = set()
 

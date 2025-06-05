@@ -30,33 +30,35 @@
                 <span>→</span>
                 <span class = "destination">YoutubeMusic</span>
             </div>
-            <p>3 Playlists</p>
+            <p>{{ results|length }} Playlists</p>
             <div class = "total-summary">
                 <div>
-                    <span>239</span>
+                    <span>{{ total_songs }}</span>
                     <p>Total songs</p>
                 </div>
                 <div>
-                    <span class = "success">201</span>
+                    <span class = "success">{{total_success}}</span>
                     <p>Successfully Transfered</p>
                 </div>
                 <div>
-                    <span class = "failed">38</span>
+                    <span class = "failed">{{total_failed}}</span>
                     <p>Failed to Transfer</p>
                 </div>
             </div>
             <h3>Playlist Breakdown:</h3>
-            {% for _ in range(5) %}
+       {% for playlist_name, songs in results.items() %}
+                {% if songs|length > 0 %}
                 <div class="playlist">
-                    <span></span>
-                    <h4>My Favourite Hits 2024</h4>
-                    <div>
-                        <p class="success">98✓</p>
-                        <p class="failed">29✗</p>
-                        <p>127 total</p>
-                    </div>
+                  <span></span>
+                 <h4>{{ playlist_name }}</h4>
+                 <div>
+                    <p class="success">{{ songs[0] - (songs|length - 1) }} ✓</p>
+                    <p class="failed">{{ songs|length - 1 }} ✗</p>
+                    <p>{{ songs[0] }} total</p>
                 </div>
-            {% endfor %}
+                </div>
+            {% endif %}
+        {% endfor %}
 
         </div>
         <div class = "explanation">
@@ -77,23 +79,27 @@
                 <h4>Songs That Couldn't Be Transferred</h4>
                 <p>8 of 8 songs shown</p>
             </div>
-           {% for _ in range(10) %}
-                <div class="song">
-                    <div class="song-icon">
-                        <span>♫</span>
-                    </div>
-                    <div class="song-info">
-                        <h3 class="song-title">1999</h3>
-                        <p class="artist">Sleepy Hallow</p>
-                        <div class="song-meta">
-                            <div class="playlist-indicator">
-                                <span class="playlist-dot"></span>
-                                <span class="playlist-name">My Favourite Hits 2024</span>
-                            </div>
+           {% for playlist_name, songs in results.items() %}
+                {% if songs|length > 1 %}
+                     {% for song in songs[1:] %}
+            <div class="song">
+                <div class="song-icon">
+                    <span>♫</span>
+                </div>
+                <div class="song-info">
+                    <h3 class="song-title">{{ song["song"] }}</h3>
+                    <p class="artist">{{ song["artists"] }}</p>
+                    <div class="song-meta">
+                        <div class="playlist-indicator">
+                            <span class="playlist-dot"></span>
+                            <span class="playlist-name">{{ playlist_name }}</span>
                         </div>
                     </div>
                 </div>
-            {% endfor %}
+            </div>
+                {% endfor %}
+            {% endif %}
+        {% endfor %}
 
         </div>
     </main> 

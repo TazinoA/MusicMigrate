@@ -1,7 +1,6 @@
 import axios from "https://esm.sh/axios"
 
 const select = document.querySelector("select");
-const buttons = document.querySelectorAll(".connect");
 const selectAllButton = document.querySelector("#select-all");
 const checkboxes = document.querySelectorAll(".playlist input[type='checkbox']");
 const transferButton = document.querySelector("#transfer-button");
@@ -27,26 +26,9 @@ select.addEventListener("change", () => {
     const selectedValue = select.value;
     let currentSource = document.querySelector("#current-source")
     currentSource.innerHTML = `from ${selectedValue}`
-
-    buttons.forEach(button=>{
-        button.disabled = false;
-    })
 })
 
-buttons.forEach(button => {
-    button.addEventListener("click", handleClick);
-})
 
-function handleClick(){
-    document.querySelector(".pre-connect").classList.add("hidden");
-    document.querySelector(".pre-connect").style.order = 25;
-    document.querySelector(".transfer-details").classList.remove("hidden");
-    document.querySelector(".transfer-details").style.order = 3;
-    document.querySelector(".display-playlists").classList.remove("hidden");
-    document.querySelector(".display-playlists").style.order = 2;
-    document.querySelector(".select-destination").classList.remove("hidden");
-    document.querySelector(".select-platforms>button").classList.add("hidden");
-}
 
 function updateCounts() {
   const checked = document.querySelectorAll(".playlist input[type='checkbox']:checked");
@@ -73,8 +55,12 @@ function handleSubmit(){
                 playlists:playlists
             }
         ).then(response => {
-          console.log(response.status)
-        }).finally(hideLoadingOverlay)
+          window.location.href = response.data.redirect;
+        }).catch(error =>{
+          console.error(error);
+        }).finally(hideLoadingOverlay);
+
+
         showLoadingOverlay();
 }
 

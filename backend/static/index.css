@@ -63,6 +63,7 @@ body{
   align-items: center;
   background-color: var(--bg-header);
   backdrop-filter: blur(10px);
+  height:4rem;
 }
 
 .header-right-section{

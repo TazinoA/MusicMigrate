@@ -6,6 +6,7 @@
     <link rel="stylesheet" href="../static/index.css"/>
     <link rel="stylesheet" href="../static/transfer.css"/>
     <title>MusicMigrate</title>
+    
 </head>
 <body>
     <header class="header">
@@ -36,8 +37,7 @@
               {% endfor %}
             </select>
           </div>
-          <button disabled class = "connect">Connect to Platform</button>
-          <div class="select-destination hidden">
+          <div class="select-destination">
             <p>Destination Platform</p>
             <select name="destination">
               <option value="" hidden disabled selected>Select destination platform</option>
@@ -48,20 +48,14 @@
           </div>
         </div>
 
-        <div class="pre-connect">
-          <h2>Connect to a Music Platform</h2>
-          <p>Select a source platform and connect your account to view your playlists</p>
-          <button disabled class = "connect">Connect to platform</button>
-        </div>
-
-        <div class="transfer-details hidden">
+        <div class="transfer-details">
           <h3>Transfer Summary</h3>
           <p>Selected Playlists: <span id = "playlist-count">0</span></p>
           <p>Total Tracks: <span id = "track-count">0</span></p>
           <button id = "transfer-button">Start Transfer →</button>
         </div>
 
-        <div class="display-playlists hidden">
+        <div class="display-playlists">
           <div class="display-playlists-header">
             <h3>Your playlists <span id = "current-source">from Spotify</span></h3>
             <button id = "select-all">Select All</button>
@@ -120,7 +114,6 @@
       </div>
     </div>
   </div>
-
     <script type = "module" src="../static/main.js"></script>    
 </body>
 </html>

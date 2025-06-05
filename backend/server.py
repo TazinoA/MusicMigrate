@@ -31,6 +31,16 @@ def redirect_page():
     return redirect(url_for("display_playlists"))
 
 
+
+@app.route("/transfer", methods = ["POST", "GET"])
+def transfer():
+    if request.method == "GET":
+       path = os.path.join(app.static_folder, "cards.json")
+       with open(path) as f:
+           cards = json.load(f)
+       return render_template("transfer.html", cards=cards)
+  
+
 @app.route("/get-playlists", methods = ["POST", "GET"])
 def display_playlists():
    if request.method == "GET":
@@ -49,13 +59,26 @@ def display_playlists():
        
        unfound = add_ytSongs(result, progress_callback)
        session["results"] = unfound
-       return redirect(url_for("results"))
-   
+       return jsonify({"redirect": url_for("results")})
 
 @app.route("/results")
 def results():
     results = session.get("results", [])
-    return render_template("results.html")
+    total_songs = 0
+    total_failed = 0
+    for playlist in results.values():
+        if playlist:
+            total_songs += playlist[0] 
+            total_failed += len(playlist) - 1 
+
+    total_success = total_songs - total_failed
+    return render_template(
+    "results.html",
+    results=results,
+    total_songs=total_songs,
+    total_success=total_success,
+    total_failed=total_failed
+    )
        
 
 @app.route("/update-selected", methods = ["POST"])

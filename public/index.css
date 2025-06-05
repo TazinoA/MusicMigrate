@@ -53,6 +53,7 @@ body{
   padding:0;
 }
 
+
 .header{
   border: 1px solid var(--border-header);
   color:white;
@@ -63,6 +64,7 @@ body{
   align-items: center;
   background-color: var(--bg-header);
   backdrop-filter: blur(10px);
+  height:4rem;
 }
 
 .header-right-section{
