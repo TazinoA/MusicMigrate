@@ -1,6 +1,6 @@
 import axios from "https://esm.sh/axios"
 
-const select = document.querySelector("select");
+const select = document.querySelector(".source");
 const selectAllButton = document.querySelector("#select-all");
 const checkboxes = document.querySelectorAll(".playlist input[type='checkbox']");
 const transferButton = document.querySelector("#transfer-button");
@@ -26,6 +26,7 @@ select.addEventListener("change", () => {
     const selectedValue = select.value;
     let currentSource = document.querySelector("#current-source")
     currentSource.innerHTML = `from ${selectedValue}`
+    window.location.href = "/transfer"
 })
 
 

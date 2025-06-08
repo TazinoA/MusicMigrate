@@ -12,7 +12,7 @@ import json
 
 
 app = Flask(__name__)
-CORS(app, supports_credentials=True)
+CORS(app)
 app.secret_key = os.getenv("APP_SECRET")
 app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=1)
 event_queue = queue.Queue()
@@ -23,8 +23,10 @@ def get_auth():
 
 @app.route("/callback")
 def redirect_page():
+    source_backup = session.get("source")
     session.permanent = True
     session.clear()
+    session["source"] = source_backup
     code = request.args["code"]
     token_info = get_sp().get_access_token(code)
 

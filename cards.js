@@ -5,11 +5,6 @@ const cards = [
     logo: "/images/spotify.svg",
   },
   {
-    name: "Apple Music",
-    class: "apple-music",
-    logo: "/images/apple-music.svg",
-  },
-  {
     name: "YouTube Music",
     class: "youtube-music",
     logo: "/images/youtube.svg",
@@ -18,11 +13,6 @@ const cards = [
     name: "Amazon Music",
     class: "amazon-music",
     logo: "/images/amazon.svg",
-  },
-  {
-    name: "Deezer",
-    class: "deezer",
-    logo: "/images/deezer.svg",
   },
 ];
 

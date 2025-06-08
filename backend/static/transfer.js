@@ -22,7 +22,6 @@ function saveSource(){
      headers: {
         "Content-Type": "application/json"
       },
-      credentials:"same-origin",
     body: JSON.stringify({source:select.value})
   })
 }
