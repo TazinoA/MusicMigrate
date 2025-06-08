@@ -77,7 +77,6 @@ def clean_text(text):
 
 
 def add_ytSongs(playlists, progress_callback = None):
-    print("start")
     client = get_ytClient()
     could_not_find = {}
     total_songs = sum([len(songs) for _, songs in playlists])

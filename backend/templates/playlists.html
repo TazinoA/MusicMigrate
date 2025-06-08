@@ -31,7 +31,7 @@
           <div class="select-source">
             <p>Source Platform</p>
             <select name="source">
-              <option value="" hidden disabled selected>Select source platform</option>
+              <option value="" hidden disabled selected>{{source}}</option>
               {% for card in cards %}
                 <option value="{{ card.name }}">{{ card.name }}</option>
               {% endfor %}

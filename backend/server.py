@@ -8,8 +8,11 @@ from ytMusic_client import *
 import queue
 import json
 
+
+
+
 app = Flask(__name__)
-CORS(app)
+CORS(app, supports_credentials=True)
 app.secret_key = os.getenv("APP_SECRET")
 app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=1)
 event_queue = queue.Queue()
@@ -44,11 +47,12 @@ def transfer():
 @app.route("/get-playlists", methods = ["POST", "GET"])
 def display_playlists():
    if request.method == "GET":
+       source = session.get("source")
        data = get_playlists()
        path = os.path.join(app.static_folder, "cards.json")
        with open(path) as f:
            cards = json.load(f)
-       return render_template("playlists.html", playlists = data, cards=cards)
+       return render_template("playlists.html", playlists = data, cards=cards, source = source)
    else:
        data = request.get_json()
        playlists = data.get("playlists")
@@ -108,6 +112,13 @@ def progress_stream():
             data = event_queue.get()
             yield f"data: {json.dumps(data)}\n\n"
     return Response(stream_with_context(event_stream()), mimetype="text/event-stream")
+
+
+@app.route("/save-source", methods = ["POST"])
+def save():
+    data = request.get_json()
+    session["source"] = data.get("source")
+    return "",204
 
 
 if __name__ == "__main__":
