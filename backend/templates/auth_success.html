@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Authentication Successful</title>
+    <script>
+        try {
+            if (window.parent && window.parent !== window) {
+                window.parent.postMessage({
+                    type: 'authSuccess',
+                    platform: '{{ authenticated_platform }}'
+                }, '*');
+            }
+        } catch (e) {
+            console.error("Error posting message to parent:", e);
+        } finally {
+            window.top.location.href = "{{ playlists_url }}";
+        }
+    </script>
+</head>
+<body>
+    <p>Authentication successful. Redirecting...</p>
+</body>
+</html>

@@ -12,28 +12,33 @@ import json
 
 
 app = Flask(__name__)
-CORS(app)
+CORS(app, supports_credentials=True)
 app.secret_key = os.getenv("APP_SECRET")
 app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=1)
 event_queue = queue.Queue()
 
-@app.route("/")
-def get_auth():
-    return redirect(get_sp().get_authorize_url())
 
 @app.route("/callback")
 def redirect_page():
-    source_backup = session.get("source")
     session.permanent = True
-    session.clear()
-    session["source"] = source_backup
+    # session.clear() 
     code = request.args["code"]
-    token_info = get_sp().get_access_token(code)
+    
+    # TODO: Determine platform dynamically if other platforms might use this same /callback URL.
+    # For now, as Spotify is the primary integrated platform using this OAuth callback:
+    platform_name = "Spotify" 
 
-    session["token_info"] = token_info
+    token_info = get_sp().get_access_token(code) 
+
+    session["token_info"] = token_info 
     session['expires_in'] = token_info['expires_in']
     session['start_time'] = time.time()
-    return redirect(url_for("display_playlists"))
+    
+    session[f"{platform_name}_authenticated"] = True
+
+    return render_template("auth_success.html", 
+                           playlists_url=url_for("display_playlists"), 
+                           authenticated_platform=platform_name)
 
 
 
@@ -70,6 +75,7 @@ def display_playlists():
 @app.route("/results")
 def results():
     results = session.get("results", [])
+    print(results)
     total_songs = 0
     total_failed = 0
     for playlist in results.values():
@@ -83,7 +89,9 @@ def results():
     results=results,
     total_songs=total_songs,
     total_success=total_success,
-    total_failed=total_failed
+    total_failed=total_failed,
+    source = "Spotify",
+    destination = "YoutubeMusic"
     )
        
 
@@ -121,6 +129,42 @@ def save():
     data = request.get_json()
     session["source"] = data.get("source")
     return "",204
+
+
+@app.route("/check-auth-status", methods=["GET"])
+def check_auth_status():
+    platform_name = request.args.get("platform")
+    is_authenticated = False
+
+    if platform_name == "Spotify":
+        if session.get("token_info"):
+            is_authenticated = True
+    elif platform_name == "Amazon Music":
+        if session.get("amazon_token_info"):
+            is_authenticated = True
+    elif platform_name == "Deezer":
+        if session.get("deezer_token_info"):
+            is_authenticated = True
+
+    return jsonify({"is_authenticated": is_authenticated, "platform": platform_name})
+
+
+@app.route("/auth/start")
+def start_auth():
+    platform_name = request.args.get("platform")
+    auth_url = None
+
+    if platform_name == "Spotify":
+        auth_url = get_sp().get_authorize_url()
+    elif platform_name == "YouTube Music":
+        return f"Direct authentication initiation for {platform_name} is not yet implemented.", 501
+    else:
+        return "Unknown platform specified for authentication.", 400
+
+    if auth_url:
+        return redirect(auth_url)
+    else:
+        return f"Could not initiate authentication for {platform_name}. Configuration might be missing or platform not supported for direct auth.", 500
 
 
 if __name__ == "__main__":

@@ -26,9 +26,9 @@
         <p>Review songs that couldn't be transferred to your destination platform</p>
         <div class = "playlist-breakdown">
             <div class = "breakdown-title">
-                <span class = "source">Spotify</span>
+                <span class = "source">{{source}}</span>
                 <span>→</span>
-                <span class = "destination">YoutubeMusic</span>
+                <span class = "destination">{{destination}}</span>
             </div>
             <p>{{ results|length }} Playlists</p>
             <div class = "total-summary">
@@ -61,23 +61,45 @@
         {% endfor %}
 
         </div>
-        <div class = "explanation">
-            <p>Some songs couldn't be transferred due to platform restrictions or availability issues.You can export the list for manual review.</p>
+        
+        {% set has_failed_songs = namespace(value=false) %}
+        {% for playlist_name, songs in results.items() %}
+            {% if songs|length > 1 %}
+                {% set has_failed_songs.value = true %}
+            {% endif %}
+        {% endfor %}
+        
+        
+        {% if not has_failed_songs.value %}
+        <div id = "successful">
+            <span>✔</span>
+            <div>
+                <h4>Transfer Complete!</h4>
+                <p>All {{ total_songs }} songs from your {{ results|length }} playlists have been successfully transferred to {{ destination }}</p>
+            </div>
+        </div>
+        {% endif %}
+        
+       
+        {% if has_failed_songs.value %}
+        <div id = "unsuccessful">
+         <div class = "explanation">
+            <p>Some songs couldn't be transferred due to platform restrictions or availability issues. You can export the list for manual review.</p>
         </div>
         <div class = "search-functionality">
            <input type="text" placeholder="Search failed songs..." class = "search-bar">
            <select>
             <option value = "all">All Playlists</option>
-            <option value = "running">Running</option>
-            <option value = "p">P</option>
-            <option value = "test">test</option>
+            {% for playlist_name in results.keys() %}
+            <option value = "{{ playlist_name }}">{{ playlist_name }}</option>
+            {% endfor %}
            </select>
            <button>⤓ Export List</button>
         </div>
         <div class = "songs-display">
             <div id = "display-title">
                 <h4>Songs That Couldn't Be Transferred</h4>
-                <p>8 of 8 songs shown</p>
+                <p>{{ total_failed }} of {{ total_songs }} songs shown</p>
             </div>
            {% for playlist_name, songs in results.items() %}
                 {% if songs|length > 1 %}
@@ -102,6 +124,8 @@
         {% endfor %}
 
         </div>
+        </div>
+        {% endif %}
     </main> 
 </body>
 </html>

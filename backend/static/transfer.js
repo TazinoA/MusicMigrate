@@ -12,7 +12,7 @@ select.addEventListener("change", () => {
 buttons.forEach(button => {
   button.addEventListener("click",() =>{
     saveSource();
-    window.location.href = "/"
+    window.location.href = `/auth/start?platform=${select.value}`
   })
 });
 

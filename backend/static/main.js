@@ -1,12 +1,17 @@
 import axios from "https://esm.sh/axios"
 
-const select = document.querySelector(".source");
+const sourceSelect = document.querySelector("select");
+const destinationSelect = document.querySelectorAll("select")[1];
 const selectAllButton = document.querySelector("#select-all");
 const checkboxes = document.querySelectorAll(".playlist input[type='checkbox']");
 const transferButton = document.querySelector("#transfer-button");
 const source = new EventSource("/progress-stream");
 const loadingOverlay = document.querySelector('.loading-overlay');
 const backdrop = document.querySelector(".backdrop");
+
+const authModal = document.getElementById("authModal");
+const authFrame = document.getElementById("authFrame");
+// const modalCloseButton = document.querySelector(".modal-close-button"); // If needed later
 
 transferButton.addEventListener("click", handleSubmit);
 
@@ -22,12 +27,56 @@ selectAllButton.addEventListener("click", ()=> {
     });
 })
 
-select.addEventListener("change", () => {
-    const selectedValue = select.value;
-    let currentSource = document.querySelector("#current-source")
-    currentSource.innerHTML = `from ${selectedValue}`
-    window.location.href = "/transfer"
-})
+sourceSelect.addEventListener("change", function () {
+  const selectedValue = this.value;
+  let currentSource = document.querySelector("#current-source")
+  currentSource.innerHTML = `from ${selectedValue}`;
+
+  axios.get(`/check-auth-status?platform=${selectedValue}`)
+    .then(response => {
+      const { is_authenticated } = response.data;
+      if (!is_authenticated) {
+        window.location.href = `/transfer?platform=${selectedValue}`;
+      }
+    })
+    .catch(error => {
+      console.error("Error checking auth status for source platform:", error);
+    });
+});
+
+destinationSelect.addEventListener("change", function () {
+  const selectedValue = this.value;
+
+  axios.get(`/check-auth-status?platform=${selectedValue}`)
+    .then(response => {
+      const { is_authenticated } = response.data;
+      if (!is_authenticated) {
+        openAuthModal(selectedValue);
+      }
+    })
+    .catch(error => {
+      console.error("Error checking auth status for destination platform:", error);
+    });
+});
+
+
+function openAuthModal(platformName) {
+    if (authModal && authFrame) {
+        authFrame.src = `/auth/start?platform=${platformName}`; 
+        authModal.style.display = "flex";
+    }
+}
+
+function closeAuthModal() {
+    if (authModal) {
+        authModal.style.display = "none";
+    }
+    if (authFrame) {
+        authFrame.src = "";
+    }
+}
+
+window.closeAuthModal = closeAuthModal;
 
 
 

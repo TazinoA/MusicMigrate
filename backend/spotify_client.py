@@ -17,7 +17,7 @@ def get_sp():
 def get_client():
     token_info = session.get("token_info")
     if not token_info:
-        return redirect(url_for("get_auth"))
+        return redirect(get_sp().get_authorize_url())
     
     expiration_time = session['start_time'] + session['expires_in']
 
