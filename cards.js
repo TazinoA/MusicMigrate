@@ -9,11 +9,6 @@ const cards = [
     class: "youtube-music",
     logo: "/images/youtube.svg",
   },
-  {
-    name: "Amazon Music",
-    class: "amazon-music",
-    logo: "/images/amazon.svg",
-  },
 ];
 
 export default cards;

@@ -65,7 +65,7 @@
           </div>
           <div class="playlists">
           {% for playlist in playlists %}
-            <label class="playlist" for="playlist-{{ playlist.id }}">
+            <label class="playlist" for="playlist-{{ playlist.id }}" id = "{{playlist.name}}">
             <input type="checkbox" name="{{playlist.name}}" value="{{ playlist.count }}" id="playlist-{{ playlist.id }}" data-id = "{{playlist.id}}"class="checkbox">
             <img src="{{ playlist.logo }}" alt="{{ playlist.name }}">
           <div>
@@ -117,7 +117,6 @@
     </div>
   </div>
     <script type = "module" src="../static/main.js"></script>    
-
     <div id="authModal" class="modal-overlay" style="display:none;">
         <div class="modal-content">
             <button class="modal-close-button" onclick="closeAuthModal()">&times;</button>

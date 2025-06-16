@@ -318,3 +318,7 @@ img.deezer {
 .how-it-works-body>div>p{
   color: var(--text-body);
 }
+
+.hidden {
+  display: none !important;
+}

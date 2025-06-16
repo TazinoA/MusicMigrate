@@ -94,17 +94,16 @@
             <option value = "{{ playlist_name }}">{{ playlist_name }}</option>
             {% endfor %}
            </select>
-           <button>⤓ Export List</button>
+           <button class = "export">⤓ Export List</button>
         </div>
         <div class = "songs-display">
             <div id = "display-title">
                 <h4>Songs That Couldn't Be Transferred</h4>
-                <p>{{ total_failed }} of {{ total_songs }} songs shown</p>
             </div>
            {% for playlist_name, songs in results.items() %}
                 {% if songs|length > 1 %}
                      {% for song in songs[1:] %}
-            <div class="song">
+            <div class="song" id = "{{song['song']}}">
                 <div class="song-icon">
                     <span>♫</span>
                 </div>
@@ -127,5 +126,6 @@
         </div>
         {% endif %}
     </main> 
+    <script type = "module" src="../static/result.js"></script>  
 </body>
 </html>

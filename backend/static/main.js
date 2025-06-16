@@ -8,6 +8,8 @@ const transferButton = document.querySelector("#transfer-button");
 const source = new EventSource("/progress-stream");
 const loadingOverlay = document.querySelector('.loading-overlay');
 const backdrop = document.querySelector(".backdrop");
+const searchBar = document.querySelector(".search-bar");
+const playlists = document.querySelectorAll(".playlist");
 
 const authModal = document.getElementById("authModal");
 const authFrame = document.getElementById("authFrame");
@@ -18,6 +20,14 @@ transferButton.addEventListener("click", handleSubmit);
 checkboxes.forEach(cb => {
     cb.addEventListener("change",updateCounts)
 })
+
+searchBar.addEventListener("input" ,(e) => {
+ const value = e.target.value.toLowerCase();
+ playlists.forEach(playlist =>{
+ const isVisible = playlist.id.toLowerCase().includes(value);
+ playlist.classList.toggle("hidden", !isVisible);
+ })
+});
 
 selectAllButton.addEventListener("click", ()=> {
     const allSelected = Array.from(checkboxes).every(cb => cb.checked);
@@ -44,20 +54,20 @@ sourceSelect.addEventListener("change", function () {
     });
 });
 
-destinationSelect.addEventListener("change", function () {
-  const selectedValue = this.value;
+// destinationSelect.addEventListener("change", function () {
+//   const selectedValue = this.value;
 
-  axios.get(`/check-auth-status?platform=${selectedValue}`)
-    .then(response => {
-      const { is_authenticated } = response.data;
-      if (!is_authenticated) {
-        openAuthModal(selectedValue);
-      }
-    })
-    .catch(error => {
-      console.error("Error checking auth status for destination platform:", error);
-    });
-});
+//   axios.get(`/check-auth-status?platform=${selectedValue}`)
+//     .then(response => {
+//       const { is_authenticated } = response.data;
+//       if (!is_authenticated) {
+//         openAuthModal(selectedValue);
+//       }
+//     })
+//     .catch(error => {
+//       console.error("Error checking auth status for destination platform:", error);
+//     });
+// });
 
 
 function openAuthModal(platformName) {

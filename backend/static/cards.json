@@ -8,10 +8,5 @@
     "name": "YouTube Music",
     "class": "youtube-music",
     "logo": "/images/youtube.svg"
-  },
-  {
-    "name": "Amazon Music",
-    "class": "amazon-music",
-    "logo": "/images/amazon.svg"
   }
 ]

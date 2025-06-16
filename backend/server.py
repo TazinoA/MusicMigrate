@@ -2,9 +2,11 @@ from flask import Flask, redirect,url_for,render_template,session,request,jsonif
 import time
 import os
 from datetime import timedelta
-from spotify_client import *
+from spotify_client import SpotifyHandler
 from flask_cors import CORS
-from ytMusic_client import *
+from ytMusic_client import YouTubeMusicHandler
+from soundcloud_client import SoundCloudHandler
+from deezer_client import DeezerHandler
 import queue
 import json
 
@@ -16,7 +18,8 @@ CORS(app, supports_credentials=True)
 app.secret_key = os.getenv("APP_SECRET")
 app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=1)
 event_queue = queue.Queue()
-
+sp_client = SpotifyHandler()
+yt_client = YouTubeMusicHandler()
 
 @app.route("/callback")
 def redirect_page():
@@ -24,15 +27,13 @@ def redirect_page():
     # session.clear() 
     code = request.args["code"]
     
-    # TODO: Determine platform dynamically if other platforms might use this same /callback URL.
-    # For now, as Spotify is the primary integrated platform using this OAuth callback:
-    platform_name = "Spotify" 
+    platform_name = session["source"] 
 
-    token_info = get_sp().get_access_token(code) 
-
-    session["token_info"] = token_info 
-    session['expires_in'] = token_info['expires_in']
-    session['start_time'] = time.time()
+    if platform_name == "Spotify":
+        token_info = sp_client.get_sp_oauth().get_access_token(code) 
+        session["sp_token_info"] = token_info 
+        session['sp_expires_in'] = token_info['expires_in']
+        session['sp_start_time'] = time.time()
     
     session[f"{platform_name}_authenticated"] = True
 
@@ -55,7 +56,7 @@ def transfer():
 def display_playlists():
    if request.method == "GET":
        source = session.get("source")
-       data = get_playlists()
+       data = sp_client.get_playlists()
        path = os.path.join(app.static_folder, "cards.json")
        with open(path) as f:
            cards = json.load(f)
@@ -63,12 +64,12 @@ def display_playlists():
    else:
        data = request.get_json()
        playlists = data.get("playlists")
-       result = get_songs(playlists)
+       result = sp_client.get_songs(playlists)
        
        if isinstance(result, Response):
            return result, 400
        
-       unfound = add_ytSongs(result, progress_callback)
+       unfound = yt_client.add_songs_to_playlist(result, progress_callback)
        session["results"] = unfound
        return jsonify({"redirect": url_for("results")})
 
@@ -137,13 +138,7 @@ def check_auth_status():
     is_authenticated = False
 
     if platform_name == "Spotify":
-        if session.get("token_info"):
-            is_authenticated = True
-    elif platform_name == "Amazon Music":
-        if session.get("amazon_token_info"):
-            is_authenticated = True
-    elif platform_name == "Deezer":
-        if session.get("deezer_token_info"):
+        if session.get("sp_token_info"):
             is_authenticated = True
 
     return jsonify({"is_authenticated": is_authenticated, "platform": platform_name})
@@ -155,9 +150,7 @@ def start_auth():
     auth_url = None
 
     if platform_name == "Spotify":
-        auth_url = get_sp().get_authorize_url()
-    elif platform_name == "YouTube Music":
-        return f"Direct authentication initiation for {platform_name} is not yet implemented.", 501
+        auth_url = sp_client.get_sp_oauth().get_authorize_url()
     else:
         return "Unknown platform specified for authentication.", 400
 
