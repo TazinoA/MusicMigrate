@@ -89,8 +89,12 @@ Once the application is running, follow these steps to transfer your playlists:
 
 4.  **Select Destination Platform (YouTube Music):**
     *   Once authenticated with Spotify, you'll typically be on a page showing your Spotify playlists.
-    *   The application is currently hardcoded to use YouTube Music as the destination. There might not be an explicit selection step for the destination in the current version.
-    *   **YouTube Music Authentication:** `ytmusicapi` (the library used for YouTube Music) usually works without explicit OAuth for browsing and finding songs. For adding to playlists, it might require authentication. If you encounter issues with adding songs to YouTube Music, you might need to perform a one-time setup for `ytmusicapi` by creating `oauth.json`. Follow the instructions from the [ytmusicapi documentation](https://ytmusicapi.readthedocs.io/en/latest/setup/oauth.html) if transfers fail due to authentication. This typically involves running a command like `ytmusicapi oauth` in your terminal and following the prompts.
+    *   The application is currently configured to use YouTube Music as the destination platform.
+    *   **YouTube Music Authentication:** The `ytmusicapi` library, used for interacting with YouTube Music, requires authentication to add songs to your playlists.
+        *   When you initiate a transfer to YouTube Music for the first time, the application (specifically, the `backend/server.py` script) will attempt to authenticate.
+        *   **Check your terminal:** The terminal window where `python backend/server.py` is running will display any necessary authentication instructions or links provided by `ytmusicapi`. This usually involves visiting a URL in your browser and entering a code.
+        *   Follow these on-screen terminal prompts to authorize MusicMigrate to access your YouTube Music account. This is typically a one-time setup, and your credentials will be stored locally (often as `oauth.json`) for future use by `ytmusicapi`.
+        *   If the terminal instructions are unclear, or if you encounter persistent authentication issues, you can consult the [ytmusicapi OAuth setup documentation](https://ytmusicapi.readthedocs.io/en/latest/setup/oauth.html) for more details on manual setup if needed.
 
 5.  **Choose Playlists to Transfer:**
     *   A list of your Spotify playlists will be displayed.
@@ -122,3 +126,4 @@ Contributions are welcome! If you'd like to contribute:
 6.  Create a new Pull Request.
 
 Please ensure your code follows any existing style guidelines and includes tests if applicable.
+
