@@ -54,20 +54,21 @@ sourceSelect.addEventListener("change", function () {
     });
 });
 
-// destinationSelect.addEventListener("change", function () {
-//   const selectedValue = this.value;
+destinationSelect.addEventListener("change", function () {
+  const selectedValue = this.value;
 
-//   axios.get(`/check-auth-status?platform=${selectedValue}`)
-//     .then(response => {
-//       const { is_authenticated } = response.data;
-//       if (!is_authenticated) {
-//         openAuthModal(selectedValue);
-//       }
-//     })
-//     .catch(error => {
-//       console.error("Error checking auth status for destination platform:", error);
-//     });
-// });
+  axios.get(`/check-auth-status?platform=${selectedValue}`)
+    .then(response => {
+      const { is_authenticated } = response.data;
+      if (!is_authenticated) {
+        //openAuthModal(selectedValue);
+        axios.get( `/auth/start?platform=${selectedValue}`)
+      }
+    })
+    .catch(error => {
+      console.error("Error checking auth status for destination platform:", error);
+    });
+});
 
 
 function openAuthModal(platformName) {

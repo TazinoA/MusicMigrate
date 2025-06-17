@@ -9,3 +9,7 @@ document.querySelector(".header button").addEventListener("click", () => {
 document.querySelector("#hiw").addEventListener("click" ,() =>{
     document.querySelector(".how-it-works").scrollIntoView({behavior:"smooth"});
 });
+
+document.querySelector(".learn-more").addEventListener("click" ,() =>{
+    document.querySelector(".how-it-works").scrollIntoView({behavior:"smooth"});
+});

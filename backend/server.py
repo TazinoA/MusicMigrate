@@ -151,6 +151,8 @@ def start_auth():
 
     if platform_name == "Spotify":
         auth_url = sp_client.get_sp_oauth().get_authorize_url()
+    elif platform_name == "YouTube Music":
+        yt_client.setup_oauth()
     else:
         return "Unknown platform specified for authentication.", 400
 
