@@ -53,11 +53,7 @@ This section covers how to get the MusicMigrate application running locally on y
     ```
 
 4.  **Install dependencies:**
-    ```bash
-    pip install -r requirements.txt
-    ```
-    *(If `requirements.txt` is missing or incomplete, you might need to install packages like `Flask`, `spotipy`, `ytmusicapi`, `python-dotenv` manually using `pip install <package-name>`)*
-
+  
 ### Running the Application
 
 1.  **Ensure environment variables are set** (as described in Installation step 2).
