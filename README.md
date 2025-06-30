@@ -1,7 +1,7 @@
 # MusicMigrate
 
 MusicMigrate is a web application that allows users to transfer their playlists between different music streaming platforms. 
-**Currently, MusicMigrate primarily supports playlist transfers from Spotify to YouTube Music.** Support for other music platforms (such as Apple Music, Deezer, etc.) may be added in future updates.
+**Currently, MusicMigrate primarily supports playlist transfers from Spotify to YouTube Music.** Support for other music platforms (such as Apple Music, Deezer, etc.) may be added in the future.
 
 ## Features
 
