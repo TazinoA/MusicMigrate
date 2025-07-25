@@ -5,8 +5,6 @@ from datetime import timedelta
 from spotify_client import SpotifyHandler
 from flask_cors import CORS
 from ytMusic_client import YouTubeMusicHandler
-from soundcloud_client import SoundCloudHandler
-from deezer_client import DeezerHandler
 import queue
 import json
 
@@ -76,7 +74,6 @@ def display_playlists():
 @app.route("/results")
 def results():
     results = session.get("results", [])
-    print(results)
     total_songs = 0
     total_failed = 0
     for playlist in results.values():

@@ -13,7 +13,7 @@ const playlists = document.querySelectorAll(".playlist");
 
 const authModal = document.getElementById("authModal");
 const authFrame = document.getElementById("authFrame");
-// const modalCloseButton = document.querySelector(".modal-close-button"); // If needed later
+// const modalCloseButton = document.querySelector(".modal-close-button"); 
 
 transferButton.addEventListener("click", handleSubmit);
 
