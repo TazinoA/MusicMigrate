@@ -14,8 +14,7 @@
         <h2>MusicMigrate</h2>
       </div>
       <div class="header-right-section">
-        <p>Home</p>
-        <p>Contact</p>
+        <a href = "http://localhost:3000">Home</a>
       </div>
     </header>
 
@@ -33,7 +32,9 @@
             <select name="source">
               <option value="" hidden disabled selected>{{source}}</option>
               {% for card in cards %}
+                {% if card.name == source%}
                 <option value="{{ card.name }}">{{ card.name }}</option>
+                {% endif %}
               {% endfor %}
             </select>
           </div>

@@ -47,6 +47,7 @@ def transfer():
        path = os.path.join(app.static_folder, "cards.json")
        with open(path) as f:
            cards = json.load(f)
+           cards = [card for card in cards if card["name"] == "Spotify"]
        return render_template("transfer.html", cards=cards)
   
 
@@ -156,7 +157,7 @@ def start_auth():
     if auth_url:
         return redirect(auth_url)
     else:
-        return f"Could not initiate authentication for {platform_name}. Configuration might be missing or platform not supported for direct auth.", 500
+        return f"Could not initiate authentication for {platform_name}.", 500
 
 
 if __name__ == "__main__":
