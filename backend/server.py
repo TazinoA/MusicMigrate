@@ -33,18 +33,29 @@ def redirect_page():
         session['sp_expires_in'] = token_info['expires_in']
         session['sp_start_time'] = time.time()
         platform_name = "Spotify"
+        session["source"] = platform_name
+        playlists_url = url_for("display_playlists")
     elif request.args["scope"] == "https://www.googleapis.com/auth/youtube":
         flow = flow_cache.pop("ytmusic", None)
         if not flow:
             return "OAuth flow not initialized", 400
-        token_info = yt_client.get_auth_token(flow, code)
+        credentials = yt_client.get_auth_token(flow, code)
+        token_info = json.loads(credentials.to_json())
         print(token_info)
+        session["yt_token_info"] = {
+            'token': token_info.get("token"),
+            'refresh_token': token_info.get("refresh_token"),
+            'token_uri': token_info.get("token_uri"),
+            'scopes': token_info.get("scopes"),
+            'expires_at':token_info.get("expiry")
+        }
         platform_name = "Youtube Music"
+        playlists_url = None
     
     session[f"{platform_name}_authenticated"] = True
 
     return render_template("auth_success.html", 
-                           playlists_url=url_for("display_playlists"), 
+                           playlists_url=playlists_url, 
                            authenticated_platform=platform_name)
 
 
@@ -63,7 +74,12 @@ def transfer():
 def display_playlists():
    if request.method == "GET":
        source = session.get("source")
-       data = sp_client.get_playlists()
+       if source == "Spotify":
+           data = sp_client.get_playlists()
+       elif source == "Youtube Music":
+            data = sp_client.get_playlists()
+       else:
+            data = []
        path = os.path.join(app.static_folder, "cards.json")
        with open(path) as f:
            cards = json.load(f)
@@ -76,8 +92,8 @@ def display_playlists():
        if isinstance(result, Response):
            return result, 400
        
-       unfound = yt_client.add_songs_to_playlist(result, progress_callback)
-       session["results"] = unfound
+       unfound_yt_songs = yt_client.add_songs_to_playlist(playlists=result, token_info=session.get("yt_token_info"),progress_callback = progress_callback)
+       session["results"] = unfound_yt_songs
        return jsonify({"redirect": url_for("results")})
 
 @app.route("/results")

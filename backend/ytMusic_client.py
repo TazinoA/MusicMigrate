@@ -41,25 +41,12 @@ class YouTubeMusicHandler:
     def setup_oauth(self, code):
         return self.get_auth_token(flow = self.flow, code = code)
     
-    def get_client(self):
+    def get_client(self, token_info):
         if self._client is not None:
             return self._client
-            
-        try:
-            with open(self.auth_file, "r", encoding="utf-8") as f:
-                auth_data = json.load(f)
-        except (FileNotFoundError, json.JSONDecodeError):
-            auth_data = {}
-        
-        expires_at = auth_data.get("expires_at")
-        refresh_token = auth_data.get("refresh_token")
-        
-        if not refresh_token:
-            self.setup_oauth()
-            with open(self.auth_file, "r", encoding="utf-8") as f:
-                auth_data = json.load(f)
-                expires_at = auth_data.get("expires_at")
-                refresh_token = auth_data.get("refresh_token")
+
+        if token_info is None:
+            raise RuntimeError("YouTube Music token info is missing.")
 
         oauth_credentials = OAuthCredentials(
             client_id=self.client_id,
@@ -67,36 +54,46 @@ class YouTubeMusicHandler:
         )
 
         now = time.time()
-        if now > expires_at:
+        access_token = token_info["token"]
+        expires_at = token_info["expires_at"]
+        refresh_token = token_info["refresh_token"]
+
+        if now >= expires_at:
             new_token = oauth_credentials.refresh_token(refresh_token)
+            access_token = new_token["access_token"]
+            expires_at = now + new_token["expires_in"]
+            refresh_token = new_token.get("refresh_token", refresh_token)
 
-            auth_data["access_token"] = new_token["access_token"]
-            auth_data["expires_at"] = now + new_token["expires_in"]        
+            token_info["token"] = access_token
+            token_info["expires_at"] = expires_at
+            token_info["refresh_token"] = refresh_token
 
-            if "refresh_token" in new_token:
-                auth_data["refresh_token"] = new_token["refresh_token"]
-                refresh_token = new_token["refresh_token"]
-                
-            with open(self.auth_file, "w", encoding="utf-8") as f:
-                json.dump(auth_data, f, indent=2)
+        self._client = YTMusic(
+            OAuthCredentials(
+                client_id=self.client_id,
+                client_secret=self.client_secret,
+                access_token=access_token,
+                refresh_token=refresh_token
+            )
+        )
 
-        self._client = YTMusic(self.auth_file, oauth_credentials=oauth_credentials)
         return self._client
 
-    def create_playlist(self, name, description="Made from MusicMigrate"):
-        client = self.get_client()
+
+    def create_playlist(self, name, token_info ,description="Made from MusicMigrate"):
+        client = self.get_client(token_info=token_info)
         playlist_id = client.create_playlist(title=name, description=description)
         return playlist_id
 
-    def add_songs_to_playlist(self, playlists, progress_callback=None):
-        client = self.get_client()
+    def add_songs_to_playlist(self, playlists, token_info,progress_callback=None):
+        client = self.get_client(token_info=token_info)
         could_not_find = {}
         total_songs = sum([len(songs) for _, songs in playlists])
         total_playlists = len(playlists)
         
         for curr_playlist, (playlist_name, songs) in enumerate(playlists, 1):
             could_not_find[playlist_name] = [len(songs)]
-            playlist_id = self.create_playlist(playlist_name)
+            playlist_id = self.create_playlist(playlist_name, token_info)
             video_ids = set()
 
             total = len(songs)
@@ -265,6 +262,6 @@ class YouTubeMusicHandler:
         client = self.get_client()
         return client.search(query=query, filter="songs", limit=limit)
 
-    def get_playlists(self):
-        client = self.get_client()
+    def get_playlists(self, token_info):
+        client = self.get_client(token_info)
         return client.get_library_playlists(limit=50)
