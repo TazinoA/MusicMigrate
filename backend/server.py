@@ -18,20 +18,28 @@ app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=1)
 event_queue = queue.Queue()
 sp_client = SpotifyHandler()
 yt_client = YouTubeMusicHandler()
+flow_cache = {}
 
 @app.route("/callback")
 def redirect_page():
     session.permanent = True
-    # session.clear() 
     code = request.args["code"]
-    
-    platform_name = session["source"] 
+    platform_name = ""
 
-    if platform_name == "Spotify":
+    #On redirect from oauth, Spotify only sends back code, while Ytmusic adds scope to params
+    if "scope" not in request.args:
         token_info = sp_client.get_sp_oauth().get_access_token(code) 
         session["sp_token_info"] = token_info 
         session['sp_expires_in'] = token_info['expires_in']
         session['sp_start_time'] = time.time()
+        platform_name = "Spotify"
+    elif request.args["scope"] == "https://www.googleapis.com/auth/youtube":
+        flow = flow_cache.pop("ytmusic", None)
+        if not flow:
+            return "OAuth flow not initialized", 400
+        token_info = yt_client.get_auth_token(flow, code)
+        print(token_info)
+        platform_name = "Youtube Music"
     
     session[f"{platform_name}_authenticated"] = True
 
@@ -149,13 +157,17 @@ def start_auth():
 
     if platform_name == "Spotify":
         auth_url = sp_client.get_sp_oauth().get_authorize_url()
+        return redirect(auth_url)
     elif platform_name == "YouTube Music":
-        yt_client.setup_oauth()
+        flow, auth_url = yt_client.get_auth_url()
+        flow_cache["ytmusic"] = flow
+        print(flow)
+        print(auth_url)
     else:
         return "Unknown platform specified for authentication.", 400
 
     if auth_url:
-        return redirect(auth_url)
+        return jsonify({"auth_url":auth_url})
     else:
         return f"Could not initiate authentication for {platform_name}.", 500
 

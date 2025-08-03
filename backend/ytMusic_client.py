@@ -1,11 +1,11 @@
 from ytmusicapi import setup_oauth, YTMusic, OAuthCredentials
+from google_auth_oauthlib.flow import Flow
 import os
 from dotenv import load_dotenv, find_dotenv
 import json
 import time
 from difflib import SequenceMatcher
 import re
-
 
 class YouTubeMusicHandler:
     def __init__(self):
@@ -14,13 +14,32 @@ class YouTubeMusicHandler:
         self.client_secret = os.getenv("YT_CLIENT_SECRET")
         self.auth_file = "headers_auth.json"
         self._client = None
+
+
+    def get_auth_url(self):
+        flow = Flow.from_client_config(
+        {
+            "web":{
+                "client_id":self.client_id,
+                "client_secret":self.client_secret,
+                "redirect_uris":["http://localhost:8000/callback"],
+                "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+                "token_uri": "https://oauth2.googleapis.com/token"
+            }
+        },
+        scopes=["https://www.googleapis.com/auth/youtube"]
+    )
+        flow.redirect_uri = "http://localhost:8000/callback"
+        auth_url, _ = flow.authorization_url(prompt="consent", access_type="offline", include_granted_scopes="true")
+        self.flow = flow
+        return flow, auth_url
     
-    def setup_oauth(self):
-        setup_oauth(
-            client_id=self.client_id,
-            client_secret=self.client_secret,
-            filepath=f"./{self.auth_file}"
-        )
+    def get_auth_token(self, flow, code):
+        flow.fetch_token(code=code)
+        return flow.credentials
+
+    def setup_oauth(self, code):
+        return self.get_auth_token(flow = self.flow, code = code)
     
     def get_client(self):
         if self._client is not None:

@@ -13,7 +13,7 @@ const playlists = document.querySelectorAll(".playlist");
 
 const authModal = document.getElementById("authModal");
 const authFrame = document.getElementById("authFrame");
-// const modalCloseButton = document.querySelector(".modal-close-button"); 
+const modalCloseButton = document.querySelector(".modal-close-button"); 
 
 transferButton.addEventListener("click", handleSubmit);
 
@@ -61,7 +61,7 @@ destinationSelect.addEventListener("change", function () {
     .then(response => {
       const { is_authenticated } = response.data;
       if (!is_authenticated) {
-        //openAuthModal(selectedValue);
+        openAuthModal(selectedValue);
         axios.get( `/auth/start?platform=${selectedValue}`)
       }
     })
@@ -71,13 +71,16 @@ destinationSelect.addEventListener("change", function () {
 });
 
 
-function openAuthModal(platformName) {
+async function openAuthModal(platformName) {
     if (authModal && authFrame) {
-        authFrame.src = `/auth/start?platform=${platformName}`; 
+        const response = await fetch(`/auth/start?platform=${platformName}`);
+        const data = await response.json();
+        const authUrl = data.auth_url;
+
+        authFrame.src = authUrl;
         authModal.style.display = "flex";
     }
 }
-
 function closeAuthModal() {
     if (authModal) {
         authModal.style.display = "none";
