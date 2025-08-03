@@ -77,8 +77,8 @@ async function openAuthModal(platformName) {
         const data = await response.json();
         const authUrl = data.auth_url;
 
-        authFrame.src = authUrl;
-        authModal.style.display = "flex";
+        window.location.href = authUrl;
+        // authModal.style.display = "flex";
     }
 }
 function closeAuthModal() {

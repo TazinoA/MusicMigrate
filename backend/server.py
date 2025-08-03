@@ -177,7 +177,6 @@ def start_auth():
     elif platform_name == "YouTube Music":
         flow, auth_url = yt_client.get_auth_url()
         flow_cache["ytmusic"] = flow
-        print(flow)
         print(auth_url)
     else:
         return "Unknown platform specified for authentication.", 400
