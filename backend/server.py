@@ -12,6 +12,8 @@ import json
 
 
 app = Flask(__name__)
+app.config['SESSION_COOKIE_SAMESITE'] = "Lax"
+app.config['SESSION_COOKIE_SECURE'] = False  
 CORS(app, supports_credentials=True)
 app.secret_key = os.getenv("APP_SECRET")
 app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=1)
@@ -35,13 +37,14 @@ def redirect_page():
         platform_name = "Spotify"
         session["source"] = platform_name
         playlists_url = url_for("display_playlists")
+        print(f"Session after spotify auth: {session}")
     elif request.args["scope"] == "https://www.googleapis.com/auth/youtube":
+        print(f"Session before yt auth: {session}")
         flow = flow_cache.pop("ytmusic", None)
         if not flow:
             return "OAuth flow not initialized", 400
         credentials = yt_client.get_auth_token(flow, code)
         token_info = json.loads(credentials.to_json())
-        print(token_info)
         session["yt_token_info"] = {
             'token': token_info.get("token"),
             'refresh_token': token_info.get("refresh_token"),
@@ -50,9 +53,10 @@ def redirect_page():
             'expires_at':token_info.get("expiry")
         }
         platform_name = "Youtube Music"
-        playlists_url = None
+        playlists_url = url_for("display_playlists")
     
     session[f"{platform_name}_authenticated"] = True
+    print(f"Session after yt auth: {session}")
 
     return render_template("auth_success.html", 
                            playlists_url=playlists_url, 
@@ -177,7 +181,6 @@ def start_auth():
     elif platform_name == "YouTube Music":
         flow, auth_url = yt_client.get_auth_url()
         flow_cache["ytmusic"] = flow
-        print(auth_url)
     else:
         return "Unknown platform specified for authentication.", 400
 

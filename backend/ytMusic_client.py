@@ -12,7 +12,6 @@ class YouTubeMusicHandler:
         load_dotenv(find_dotenv())
         self.client_id = os.getenv("YT_CLIENT_ID")
         self.client_secret = os.getenv("YT_CLIENT_SECRET")
-        self.auth_file = "headers_auth.json"
         self._client = None
 
 

@@ -42,7 +42,7 @@ sourceSelect.addEventListener("change", function () {
   let currentSource = document.querySelector("#current-source")
   currentSource.innerHTML = `from ${selectedValue}`;
 
-  axios.get(`/check-auth-status?platform=${selectedValue}`)
+  axios.get(`/check-auth-status?platform=${selectedValue}`, {withCredentials:true})
     .then(response => {
       const { is_authenticated } = response.data;
       if (!is_authenticated) {
@@ -57,12 +57,12 @@ sourceSelect.addEventListener("change", function () {
 destinationSelect.addEventListener("change", function () {
   const selectedValue = this.value;
 
-  axios.get(`/check-auth-status?platform=${selectedValue}`)
+  axios.get(`/check-auth-status?platform=${selectedValue}`, {withCredentials:true})
     .then(response => {
       const { is_authenticated } = response.data;
       if (!is_authenticated) {
         openAuthModal(selectedValue);
-        axios.get( `/auth/start?platform=${selectedValue}`)
+        axios.get( `/auth/start?platform=${selectedValue}`, {withCredentials:true})
       }
     })
     .catch(error => {
@@ -73,7 +73,7 @@ destinationSelect.addEventListener("change", function () {
 
 async function openAuthModal(platformName) {
     if (authModal && authFrame) {
-        const response = await fetch(`/auth/start?platform=${platformName}`);
+        const response = await fetch(`/auth/start?platform=${platformName}`,{method:"GET", credentials:"include"});
         const data = await response.json();
         const authUrl = data.auth_url;
 
