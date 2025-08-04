@@ -1,11 +1,14 @@
-from ytmusicapi import setup_oauth, YTMusic, OAuthCredentials
+from ytmusicapi import YTMusic, OAuthCredentials
 from google_auth_oauthlib.flow import Flow
+from google.oauth2.credentials import Credentials
+from google.auth.transport.requests import Request
 import os
 from dotenv import load_dotenv, find_dotenv
 import json
 import time
 from difflib import SequenceMatcher
 import re
+from datetime import datetime
 
 class YouTubeMusicHandler:
     def __init__(self):
@@ -47,34 +50,51 @@ class YouTubeMusicHandler:
         if token_info is None:
             raise RuntimeError("YouTube Music token info is missing.")
 
+        now = time.time()
+        access_token = token_info["token"]
+        expires_at_str = token_info["expires_at"]
+
+        if isinstance(expires_at_str, str):
+            expires_at = datetime.strptime(expires_at_str, "%Y-%m-%dT%H:%M:%SZ").timestamp()
+        else:
+            expires_at = float(expires_at_str)
+
+        refresh_token = token_info["refresh_token"]
+
+        # Construct OAuthCredentials object now (required)
         oauth_credentials = OAuthCredentials(
             client_id=self.client_id,
             client_secret=self.client_secret
         )
 
-        now = time.time()
-        access_token = token_info["token"]
-        expires_at = token_info["expires_at"]
-        refresh_token = token_info["refresh_token"]
-
         if now >= expires_at:
-            new_token = oauth_credentials.refresh_token(refresh_token)
-            access_token = new_token["access_token"]
-            expires_at = now + new_token["expires_in"]
-            refresh_token = new_token.get("refresh_token", refresh_token)
-
-            token_info["token"] = access_token
-            token_info["expires_at"] = expires_at
-            token_info["refresh_token"] = refresh_token
-
-        self._client = YTMusic(
-            OAuthCredentials(
+            creds = Credentials(
+                token=access_token,
+                refresh_token=refresh_token,
+                token_uri="https://oauth2.googleapis.com/token",
                 client_id=self.client_id,
-                client_secret=self.client_secret,
-                access_token=access_token,
-                refresh_token=refresh_token
+                client_secret=self.client_secret
             )
-        )
+            creds.refresh(Request())
+            access_token = creds.token
+            refresh_token = creds.refresh_token
+            expires_at = creds.expiry.timestamp()
+
+            # Save updated info
+            token_info["token"] = access_token
+            token_info["refresh_token"] = refresh_token
+            token_info["expires_at"] = expires_at
+
+        credentials_dict = {
+            "access_token": access_token,
+            "expires_in": int(expires_at - now),
+            "scope": "https://www.googleapis.com/auth/youtube",
+            "refresh_token": refresh_token,
+            "token_type": "Bearer"
+        }
+
+        # ✅ Required in current YTMusic versions
+        self._client = YTMusic(auth=credentials_dict, oauth_credentials=oauth_credentials)
 
         return self._client
 

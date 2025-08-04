@@ -1,4 +1,4 @@
-from flask import Flask, redirect,url_for,render_template,session,request,jsonify, Response, stream_with_context
+from flask import Flask, redirect,url_for,render_template,session,request,jsonify, Response, stream_with_context, make_response
 import time
 import os
 from datetime import timedelta
@@ -37,7 +37,11 @@ def redirect_page():
         platform_name = "Spotify"
         session["source"] = platform_name
         playlists_url = url_for("display_playlists")
-        print(f"Session after spotify auth: {session}")
+        response = make_response(render_template("auth_success.html", 
+                           playlists_url=playlists_url, 
+                           authenticated_platform=platform_name))
+        response.set_cookie("sp_token_info", json.dumps(token_info), httponly=True)
+        return response
     elif request.args["scope"] == "https://www.googleapis.com/auth/youtube":
         print(f"Session before yt auth: {session}")
         flow = flow_cache.pop("ytmusic", None)
@@ -53,7 +57,13 @@ def redirect_page():
             'expires_at':token_info.get("expiry")
         }
         platform_name = "Youtube Music"
+        session["destination"] = "Youtube Music"
         playlists_url = url_for("display_playlists")
+        response = make_response(render_template("auth_success.html", 
+                           playlists_url=playlists_url, 
+                           authenticated_platform=platform_name))
+        response.set_cookie("yt_token_info", json.dumps(session["yt_token_info"]), httponly=True)
+        return response
     
     session[f"{platform_name}_authenticated"] = True
     print(f"Session after yt auth: {session}")
@@ -76,29 +86,36 @@ def transfer():
 
 @app.route("/get-playlists", methods = ["POST", "GET"])
 def display_playlists():
-   if request.method == "GET":
-       source = session.get("source")
-       if source == "Spotify":
-           data = sp_client.get_playlists()
-       elif source == "Youtube Music":
-            data = sp_client.get_playlists()
-       else:
+    if request.method == "GET":
+        source = session.get("source")
+        if source == "Spotify":
+            token_info = json.loads(request.cookies.get("sp_token_info"))
+            data = sp_client.get_playlists(token_info)
+        elif source == "Youtube Music":
+            token_info = json.loads(request.cookies.get("yt_token_info"))
+            data = yt_client.get_playlists(token_info=token_info)
+        else:
             data = []
-       path = os.path.join(app.static_folder, "cards.json")
-       with open(path) as f:
-           cards = json.load(f)
-       return render_template("playlists.html", playlists = data, cards=cards, source = source)
-   else:
-       data = request.get_json()
-       playlists = data.get("playlists")
-       result = sp_client.get_songs(playlists)
-       
-       if isinstance(result, Response):
-           return result, 400
-       
-       unfound_yt_songs = yt_client.add_songs_to_playlist(playlists=result, token_info=session.get("yt_token_info"),progress_callback = progress_callback)
-       session["results"] = unfound_yt_songs
-       return jsonify({"redirect": url_for("results")})
+        path = os.path.join(app.static_folder, "cards.json")
+        with open(path) as f:
+            cards = json.load(f)
+        
+        destination_authed = "yt_token_info" in request.cookies
+        
+        return render_template("playlists.html", playlists=data, cards=cards, source=source, destination_authed=destination_authed)
+    else:
+        data = request.get_json()
+        playlists = data.get("playlists")
+        token_info = json.loads(request.cookies.get("sp_token_info"))
+        result = sp_client.get_songs(playlists, token_info)
+        
+        if isinstance(result, Response):
+            return result, 400
+        
+        yt_token_info = json.loads(request.cookies.get("yt_token_info"))
+        unfound_yt_songs = yt_client.add_songs_to_playlist(playlists=result, token_info=yt_token_info, progress_callback=progress_callback)
+        session["results"] = unfound_yt_songs
+        return jsonify({"redirect": url_for("results")})
 
 @app.route("/results")
 def results():
@@ -164,7 +181,10 @@ def check_auth_status():
     is_authenticated = False
 
     if platform_name == "Spotify":
-        if session.get("sp_token_info"):
+        if "sp_token_info" in request.cookies:
+            is_authenticated = True
+    elif platform_name == "YouTube Music":
+        if "yt_token_info" in request.cookies:
             is_authenticated = True
 
     return jsonify({"is_authenticated": is_authenticated, "platform": platform_name})

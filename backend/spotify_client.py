@@ -21,24 +21,21 @@ class SpotifyHandler:
             scope=self.scope
         )
     
-    def get_client(self):
-        token_info = session.get("sp_token_info")
+    def get_client(self, token_info):
         if not token_info:
             return redirect(self.get_sp_oauth().get_authorize_url())
         
-        expiration_time = session['sp_start_time'] + session['sp_expires_in']
-
-        if time.time() > expiration_time:
+        # Assuming token_info contains 'expires_at'
+        if time.time() > token_info.get('expires_at', 0):
             sp_oauth = self.get_sp_oauth()
-            refresh_token = token_info["refresh_token"]
-            token_info = sp_oauth.refresh_access_token(refresh_token)
-            session["sp_token_info"] = token_info
-            session['sp_start_time'] = time.time()
+            refresh_token = token_info.get("refresh_token")
+            if refresh_token:
+                token_info = sp_oauth.refresh_access_token(refresh_token)
 
         return spotipy.Spotify(auth=token_info["access_token"])
 
-    def get_songs(self, playlists):
-        sp = self.get_client()
+    def get_songs(self, playlists, token_info):
+        sp = self.get_client(token_info)
         if not isinstance(sp, spotipy.Spotify):
             return sp
         
@@ -70,8 +67,8 @@ class SpotifyHandler:
         
         return playlists_list
 
-    def get_playlists(self):
-        sp = self.get_client()
+    def get_playlists(self, token_info):
+        sp = self.get_client(token_info)
         response = sp.current_user_playlists(limit=50)
 
         playlists = []
@@ -89,19 +86,19 @@ class SpotifyHandler:
             })
         return playlists
 
-    def get_song_uri(self, song):
-        sp = self.get_client()
+    def get_song_uri(self, song, token_info):
+        sp = self.get_client(token_info)
         response = sp.search(song, limit=1, type="track")
         if response["tracks"]["items"]:
             return response["tracks"]["items"][0]["uri"]
         return None
 
-    def add_songs(self, playlist_id, tracks):
-        sp = self.get_client()
+    def add_songs(self, playlist_id, tracks, token_info):
+        sp = self.get_client(token_info)
         sp.playlist_add_items(playlist_id=playlist_id, items=tracks)
 
-    def create_playlist(self, name, description="", public=True):
-        sp = self.get_client()
+    def create_playlist(self, name, token_info, description="", public=True):
+        sp = self.get_client(token_info)
         if not isinstance(sp, spotipy.Spotify):
             return sp
         
@@ -114,8 +111,8 @@ class SpotifyHandler:
         )
         return playlist
 
-    def search_tracks(self, query, limit=10):
-        sp = self.get_client()
+    def search_tracks(self, query, token_info, limit=10):
+        sp = self.get_client(token_info)
         if not isinstance(sp, spotipy.Spotify):
             return sp
         
