@@ -1,6 +1,6 @@
 # Music Playlist Transfer
 
-This project allows you to transfer your playlists from one music streaming service to another.
+This project allows you to transfer your playlists from Spotify to YoutubeMusic
 
 ## Getting Started
 
@@ -74,3 +74,4 @@ To run the application, you will need to start both the backend and frontend ser
     The frontend will be running on `http://localhost:3000`.
 
 You can now access the application by navigating to `http://localhost:3000` in your web browser.
+
