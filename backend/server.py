@@ -43,7 +43,6 @@ def redirect_page():
         response.set_cookie("sp_token_info", json.dumps(token_info), httponly=True)
         return response
     elif request.args["scope"] == "https://www.googleapis.com/auth/youtube":
-        print(f"Session before yt auth: {session}")
         flow = flow_cache.pop("ytmusic", None)
         if not flow:
             return "OAuth flow not initialized", 400
@@ -66,7 +65,6 @@ def redirect_page():
         return response
     
     session[f"{platform_name}_authenticated"] = True
-    print(f"Session after yt auth: {session}")
 
     return render_template("auth_success.html", 
                            playlists_url=playlists_url, 
