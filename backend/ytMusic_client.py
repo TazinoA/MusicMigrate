@@ -66,7 +66,7 @@ class YouTubeMusicHandler:
 
     def create_playlist(self, name, description="Made from MusicMigrate"):
         client = self.get_client()
-        playlist_id = client.create_playlist(title=name, description=description)
+        playlist_id = client.create_playlist(title=name, description=description, privacy_status="PRIVATE")
         return playlist_id
 
     def add_songs_to_playlist(self, playlists, progress_callback=None):
