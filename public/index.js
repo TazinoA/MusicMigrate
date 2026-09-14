@@ -1,15 +1,27 @@
-document.querySelector(".transfer-button").addEventListener("click", () => {
-    window.location.href = "http://127.0.0.1:8000/transfer";
-})
+const transferBtn = document.querySelector(".transfer-button");
+if (transferBtn) {
+    transferBtn.addEventListener("click", () => {
+        window.location.href = "/transfer";
+    });
+}
 
-document.querySelector(".header button").addEventListener("click", () => {
-    window.location.href = "http://127.0.0.1:8000/transfer";
-})
+const headerBtn = document.querySelector(".header button");
+if (headerBtn) {
+    headerBtn.addEventListener("click", () => {
+        window.location.href = "/transfer";
+    });
+}
 
-document.querySelector("#hiw").addEventListener("click" ,() =>{
-    document.querySelector(".how-it-works").scrollIntoView({behavior:"smooth"});
-});
+const hiwBtn = document.querySelector("#hiw");
+if (hiwBtn) {
+    hiwBtn.addEventListener("click", () => {
+        document.querySelector(".how-it-works")?.scrollIntoView({ behavior: "smooth" });
+    });
+}
 
-document.querySelector(".learn-more").addEventListener("click" ,() =>{
-    document.querySelector(".how-it-works").scrollIntoView({behavior:"smooth"});
-});
+const learnMoreBtn = document.querySelector(".learn-more");
+if (learnMoreBtn) {
+    learnMoreBtn.addEventListener("click", () => {
+        document.querySelector(".how-it-works")?.scrollIntoView({ behavior: "smooth" });
+    });
+}

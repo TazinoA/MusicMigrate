@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouTube Music Authentication - MusicMigrate</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='index.css') }}"/>
+    <link rel="stylesheet" href="{{ url_for('static', filename='transfer.css') }}"/>
+</head>
+<body>
+    <header class="header">
+        <div class="header-left-section">
+            <h2><a href="/" style="color: inherit; text-decoration: none;">MusicMigrate</a></h2>
+        </div>
+    </header>
+    <main class="content" style="text-align: center; max-width: 600px; margin: 40px auto; padding: 20px;">
+        <h1>YouTube Music Authentication</h1>
+        <p style="margin: 20px 0;">To connect your YouTube Music account, please follow these steps:</p>
+        <div style="background: #1f2937; padding: 20px; border-radius: 8px; text-align: left; margin-bottom: 20px;">
+            <p style="margin-bottom: 10px;"><strong>1. Open Google Authorization:</strong><br>
+               <a href="{{ verification_url }}" target="_blank" style="color: #3b82f6; word-break: break-all;">{{ verification_url }}</a>
+            </p>
+            <p style="margin-bottom: 10px;"><strong>2. Enter this code:</strong><br>
+               <span style="font-size: 24px; font-weight: bold; letter-spacing: 2px; color: #10b981;">{{ user_code }}</span>
+            </p>
+            <p><strong>3. Confirm authorization:</strong><br>
+               Once you've entered the code above in Google, click the button below to finish logging in.
+            </p>
+        </div>
+        <a href="{{ url_for('confirm_yt_auth') }}" style="display: inline-block; background-color: #2563eb; color: white; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: bold;">I Have Authorized</a>
+    </main>
+</body>
+</html>

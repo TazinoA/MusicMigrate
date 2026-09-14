@@ -15,6 +15,10 @@ dist-ssr
 *.cache
 __pycache__/
 *.pyc
+backend/headers_auth.json
+headers_auth*.json
+flask_session/
+*.db
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

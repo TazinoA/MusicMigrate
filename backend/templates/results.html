@@ -5,43 +5,42 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="../static/index.css"/>
     <link rel="stylesheet" href="../static/results.css"/>
-    <title>MusicMigrate</title>
+    <title>MusicMigrate - Results</title>
 </head>
 <body>
     <header class="header">
       <div class="header-left-section">
-        <h2>MusicMigrate</h2>
+        <h2><a href="/" style="color: inherit; text-decoration: none;">MusicMigrate</a></h2>
       </div>
       <div class="header-right-section">
-        <p>Home</p>
-        <p>Contact</p>
+        <a href="/" style="color: inherit; text-decoration: none; margin-right: 15px;">Home</a>
+        <a href="/transfer" style="color: inherit; text-decoration: none;">Transfer</a>
       </div>
     </header>
 
-    <main class = "content">
-        <div class = "title">
-            <img/>
+    <main class="content">
+        <div class="title">
             <h1> <span>♫</span> Playlist Transfer Results</h1>
         </div>
         <p>Review songs that couldn't be transferred to your destination platform</p>
-        <div class = "playlist-breakdown">
-            <div class = "breakdown-title">
-                <span class = "source">{{source}}</span>
+        <div class="playlist-breakdown">
+            <div class="breakdown-title">
+                <span class="source">{{source}}</span>
                 <span>→</span>
-                <span class = "destination">{{destination}}</span>
+                <span class="destination">{{destination}}</span>
             </div>
             <p>{{ results|length }} Playlists</p>
-            <div class = "total-summary">
+            <div class="total-summary">
                 <div>
                     <span>{{ total_songs }}</span>
                     <p>Total songs</p>
                 </div>
                 <div>
-                    <span class = "success">{{total_success}}</span>
-                    <p>Successfully Transfered</p>
+                    <span class="success">{{total_success}}</span>
+                    <p>Successfully Transferred</p>
                 </div>
                 <div>
-                    <span class = "failed">{{total_failed}}</span>
+                    <span class="failed">{{total_failed}}</span>
                     <p>Failed to Transfer</p>
                 </div>
             </div>
@@ -71,7 +70,7 @@
         
         
         {% if not has_failed_songs.value %}
-        <div id = "successful">
+        <div id="successful">
             <span>✔</span>
             <div>
                 <h4>Transfer Complete!</h4>
@@ -82,28 +81,27 @@
         
        
         {% if has_failed_songs.value %}
-        <div id = "unsuccessful">
-         <div class = "explanation">
+        <div id="unsuccessful">
+         <div class="explanation">
             <p>Some songs couldn't be transferred due to platform restrictions or availability issues. You can export the list for manual review.</p>
         </div>
-        <div class = "search-functionality">
-           <input type="text" placeholder="Search failed songs..." class = "search-bar">
+        <div class="search-functionality">
+           <input type="text" placeholder="Search failed songs..." class="search-bar">
            <select>
-            <option value = "all">All Playlists</option>
+            <option value="all">All Playlists</option>
             {% for playlist_name in results.keys() %}
-            <option value = "{{ playlist_name }}">{{ playlist_name }}</option>
+            <option value="{{ playlist_name }}">{{ playlist_name }}</option>
             {% endfor %}
            </select>
-           <!-- <button class = "export">⤓ Export List</button> -->
         </div>
-        <div class = "songs-display">
-            <div id = "display-title">
+        <div class="songs-display">
+            <div id="display-title">
                 <h4>Songs That Couldn't Be Transferred</h4>
             </div>
            {% for playlist_name, songs in results.items() %}
                 {% if songs|length > 1 %}
                      {% for song in songs[1:] %}
-            <div class="song" id = "{{song['song']}}">
+            <div class="song" id="{{song['song']}}">
                 <div class="song-icon">
                     <span>♫</span>
                 </div>
@@ -126,6 +124,6 @@
         </div>
         {% endif %}
     </main> 
-    <script type = "module" src="../static/result.js"></script>  
+    <script type="module" src="../static/result.js"></script>
 </body>
 </html>

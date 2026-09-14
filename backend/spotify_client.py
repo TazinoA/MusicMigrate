@@ -23,70 +23,112 @@ class SpotifyHandler:
     
     def get_client(self):
         token_info = session.get("sp_token_info")
-        if not token_info:
-            return redirect(self.get_sp_oauth().get_authorize_url())
+        if not token_info or not isinstance(token_info, dict):
+            return None
         
-        expiration_time = session['sp_start_time'] + session['sp_expires_in']
+        start_time = session.get("sp_start_time", 0)
+        expires_in = session.get("sp_expires_in", 3600)
+        expiration_time = start_time + expires_in
 
         if time.time() > expiration_time:
             sp_oauth = self.get_sp_oauth()
-            refresh_token = token_info["refresh_token"]
-            token_info = sp_oauth.refresh_access_token(refresh_token)
-            session["sp_token_info"] = token_info
-            session['sp_start_time'] = time.time()
+            refresh_token = token_info.get("refresh_token")
+            if refresh_token:
+                try:
+                    token_info = sp_oauth.refresh_access_token(refresh_token)
+                    session["sp_token_info"] = token_info
+                    session['sp_start_time'] = time.time()
+                    session['sp_expires_in'] = token_info.get('expires_in', 3600)
+                except Exception as e:
+                    print(f"Error refreshing Spotify token: {e}")
+                    return None
+            else:
+                return None
 
-        return spotipy.Spotify(auth=token_info["access_token"])
+        access_token = token_info.get("access_token")
+        if not access_token:
+            return None
+
+        return spotipy.Spotify(auth=access_token)
 
     def get_songs(self, playlists):
         sp = self.get_client()
-        if not isinstance(sp, spotipy.Spotify):
-            return sp
+        if not sp:
+            return None
         
         fields = "items(track(name,artists(name),album(name),duration_ms)),next"
         playlists_list = []
 
         for playlist_id, playlist_name in playlists:
-            result = sp.playlist_items(playlist_id=playlist_id, fields=fields)
+            try:
+                result = sp.playlist_items(playlist_id=playlist_id, fields=fields)
+            except Exception as e:
+                print(f"Error fetching items for playlist {playlist_id}: {e}")
+                continue
+
             songs = []
 
-            while True:
-                for item in result["items"]:
-                    track = item["track"]
+            while result:
+                for item in result.get("items", []):
+                    track = item.get("track")
                     if not track:
                         continue
                     data = {
-                        "song": track["name"],
-                        "artists": [artist["name"] for artist in track["artists"]],
-                        "album": track["album"]["name"],
-                        "duration": track["duration_ms"]
+                        "song": track.get("name", "Unknown Title"),
+                        "artists": [artist.get("name", "") for artist in track.get("artists", []) if artist.get("name")],
+                        "album": track.get("album", {}).get("name", ""),
+                        "duration": track.get("duration_ms", 0)
                     }
                     songs.append(data)
-                if result["next"]:
+                if result.get("next"):
                     result = sp.next(result)
                 else:
                     break
             
-            playlists_list.append([playlist_name, songs])
+            playlists_list.append([playlist_id, playlist_name, songs])
         
         return playlists_list
 
     def get_playlists(self):
         sp = self.get_client()
-        response = sp.current_user_playlists(limit=50)
+        if not sp:
+            return []
+
+        try:
+            response = sp.current_user_playlists(limit=50)
+        except Exception as e:
+            print(f"Error fetching playlists: {e}")
+            return []
 
         playlists = []
 
-        for data in response["items"]:
-            if data.get("images") and len(data["images"]) > 1:
-                url = data["images"][0]["url"]
+        while response:
+            for data in response.get("items", []):
+                images = data.get("images") or []
+                if images:
+                    url = images[0].get("url")
+                else:
+                    url = "https://kzmk6dbvewv371frmiwy.lite.vusercontent.net/placeholder.svg?height=60&width=60"
+
+                tracks_info = data.get("tracks") or {}
+                count = tracks_info.get("total", 0)
+
+                playlists.append({
+                    "logo": url,
+                    "name": data.get("name", "Untitled Playlist"),
+                    "id": data.get("id"),
+                    "count": count
+                })
+
+            if response.get("next"):
+                try:
+                    response = sp.next(response)
+                except Exception as e:
+                    print(f"Error paginating playlists: {e}")
+                    break
             else:
-                url = "https://kzmk6dbvewv371frmiwy.lite.vusercontent.net/placeholder.svg?height=60&width=60"
-            playlists.append({
-                "logo": url,
-                "name": data["name"],
-                "id": data["id"],
-                "count": data["tracks"]["total"]
-            })
+                break
+
         return playlists
 
     def get_song_uri(self, song):
