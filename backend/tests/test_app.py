@@ -74,6 +74,29 @@ class TestSpotifyHandler(unittest.TestCase):
         self.assertEqual(playlists[0]["name"], "Playlist 1")
         self.assertEqual(playlists[1]["name"], "Playlist 2")
 
+    @patch.object(SpotifyHandler, "get_client")
+    def test_get_playlists_track_count_variants(self, mock_get_client):
+        mock_sp = MagicMock()
+        mock_get_client.return_value = mock_sp
+
+        page = {
+            "items": [
+                {"id": "pl1", "name": "Playlist Dict Total", "tracks": {"total": 15}, "images": []},
+                {"id": "pl2", "name": "Playlist Int Total", "tracks": 8, "images": []},
+                {"id": "pl3", "name": "Playlist Total Tracks", "total_tracks": 25, "images": []},
+            ],
+            "next": None
+        }
+        mock_sp.current_user_playlists.return_value = page
+
+        handler = SpotifyHandler()
+        playlists = handler.get_playlists()
+
+        self.assertEqual(len(playlists), 3)
+        self.assertEqual(playlists[0]["count"], 15)
+        self.assertEqual(playlists[1]["count"], 8)
+        self.assertEqual(playlists[2]["count"], 25)
+
 
 class TestYouTubeMusicHandler(unittest.TestCase):
     def test_helpers(self):

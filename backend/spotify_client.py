@@ -108,21 +108,35 @@ class SpotifyHandler:
         playlists = []
 
         while response:
-            for data in response.get("items", []):
-                images = data.get("images") or []
-                if images:
-                    url = images[0].get("url")
-                else:
-                    url = "https://kzmk6dbvewv371frmiwy.lite.vusercontent.net/placeholder.svg?height=60&width=60"
+            items = response.get("items") or []
+            for data in items:
+                if not isinstance(data, dict):
+                    continue
 
-                tracks_info = data.get("tracks") or {}
-                count = tracks_info.get("total", 0)
+                images = data.get("images") or []
+                url = "https://kzmk6dbvewv371frmiwy.lite.vusercontent.net/placeholder.svg?height=60&width=60"
+                if isinstance(images, list) and len(images) > 0 and isinstance(images[0], dict):
+                    url = images[0].get("url") or url
+
+                count = None
+                tracks_data = data.get("tracks")
+                if isinstance(tracks_data, dict):
+                    count = tracks_data.get("total")
+                    if count is None and isinstance(tracks_data.get("items"), list):
+                        count = len(tracks_data["items"])
+                elif isinstance(tracks_data, int):
+                    count = tracks_data
+                elif isinstance(tracks_data, list):
+                    count = len(tracks_data)
+
+                if count is None:
+                    count = data.get("total_tracks", 0)
 
                 playlists.append({
                     "logo": url,
                     "name": data.get("name", "Untitled Playlist"),
                     "id": data.get("id"),
-                    "count": count
+                    "count": count or 0
                 })
 
             if response.get("next"):
