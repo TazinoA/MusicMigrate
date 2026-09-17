@@ -1,28 +1,32 @@
 from flask import redirect, url_for, session
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
-from dotenv import load_dotenv
+from spotipy.cache_handler import FlaskSessionCacheHandler
+from dotenv import load_dotenv, find_dotenv
 import time
 import os
 
 
 class SpotifyHandler:
     def __init__(self):
-        load_dotenv()
-        self.client_id = os.getenv("SP_CLIENT_ID")
-        self.client_secret = os.getenv("SP_CLIENT_SECRET")
+        load_dotenv(find_dotenv())
+        self.client_id = (os.getenv("SP_CLIENT_ID") or "").strip("'\" ")
+        self.client_secret = (os.getenv("SP_CLIENT_SECRET") or "").strip("'\" ")
         self.scope = "playlist-read-private playlist-modify-public playlist-modify-private playlist-read-collaborative ugc-image-upload user-top-read"
     
     def get_sp_oauth(self):
+        cache_handler = FlaskSessionCacheHandler(session)
         return SpotifyOAuth(
             client_id=self.client_id,
             client_secret=self.client_secret,
             redirect_uri=url_for("redirect_page", _external=True),
-            scope=self.scope
+            scope=self.scope,
+            cache_handler=cache_handler,
+            show_dialog=True
         )
     
     def get_client(self):
-        token_info = session.get("sp_token_info")
+        token_info = session.get("sp_token_info") or session.get("token_info")
         if not token_info or not isinstance(token_info, dict):
             return None
         
@@ -37,6 +41,7 @@ class SpotifyHandler:
                 try:
                     token_info = sp_oauth.refresh_access_token(refresh_token)
                     session["sp_token_info"] = token_info
+                    session["token_info"] = token_info
                     session['sp_start_time'] = time.time()
                     session['sp_expires_in'] = token_info.get('expires_in', 3600)
                 except Exception as e:
@@ -133,19 +138,22 @@ class SpotifyHandler:
 
     def get_song_uri(self, song):
         sp = self.get_client()
+        if not sp:
+            return None
         response = sp.search(song, limit=1, type="track")
-        if response["tracks"]["items"]:
+        if response and response.get("tracks", {}).get("items"):
             return response["tracks"]["items"][0]["uri"]
         return None
 
     def add_songs(self, playlist_id, tracks):
         sp = self.get_client()
-        sp.playlist_add_items(playlist_id=playlist_id, items=tracks)
+        if sp:
+            sp.playlist_add_items(playlist_id=playlist_id, items=tracks)
 
     def create_playlist(self, name, description="", public=True):
         sp = self.get_client()
-        if not isinstance(sp, spotipy.Spotify):
-            return sp
+        if not sp:
+            return None
         
         user_id = sp.current_user()["id"]
         playlist = sp.user_playlist_create(
@@ -158,8 +166,8 @@ class SpotifyHandler:
 
     def search_tracks(self, query, limit=10):
         sp = self.get_client()
-        if not isinstance(sp, spotipy.Spotify):
-            return sp
+        if not sp:
+            return []
         
         results = sp.search(q=query, type='track', limit=limit)
-        return results['tracks']['items']
+        return results.get('tracks', {}).get('items', [])

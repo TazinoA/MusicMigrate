@@ -63,8 +63,9 @@ def redirect_page():
 
     if platform_name == "Spotify":
         try:
-            token_info = sp_client.get_sp_oauth().get_access_token(code)
+            token_info = sp_client.get_sp_oauth().get_access_token(code, check_cache=False)
             session["sp_token_info"] = token_info
+            session["token_info"] = token_info
             session["sp_expires_in"] = token_info.get("expires_in", 3600)
             session["sp_start_time"] = time.time()
             session["Spotify_authenticated"] = True
