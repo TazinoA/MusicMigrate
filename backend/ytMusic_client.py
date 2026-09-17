@@ -1,4 +1,4 @@
-from ytmusicapi import setup_oauth, YTMusic, OAuthCredentials
+from ytmusicapi import YTMusic, OAuthCredentials
 import os
 from dotenv import load_dotenv, find_dotenv
 import json
@@ -12,77 +12,88 @@ class YouTubeMusicHandler:
         load_dotenv(find_dotenv())
         self.client_id = os.getenv("YT_CLIENT_ID")
         self.client_secret = os.getenv("YT_CLIENT_SECRET")
-        self.auth_file = "headers_auth.json"
-        self._client = None
     
-    def setup_oauth(self):
-        setup_oauth(
-            client_id=self.client_id,
-            client_secret=self.client_secret,
-            filepath=f"./{self.auth_file}"
-        )
-    
-    def get_client(self):
-        if self._client is not None:
-            return self._client
-            
-        try:
-            with open(self.auth_file, "r", encoding="utf-8") as f:
-                auth_data = json.load(f)
-        except (FileNotFoundError, json.JSONDecodeError):
-            auth_data = {}
-        
-        expires_at = auth_data.get("expires_at")
-        refresh_token = auth_data.get("refresh_token")
-        
-        if not refresh_token:
-            self.setup_oauth()
-            with open(self.auth_file, "r", encoding="utf-8") as f:
-                auth_data = json.load(f)
-                expires_at = auth_data.get("expires_at")
-                refresh_token = auth_data.get("refresh_token")
+    def get_device_code(self):
+        creds = OAuthCredentials(self.client_id, self.client_secret)
+        return creds.get_code()
 
-        oauth_credentials = OAuthCredentials(
-            client_id=self.client_id,
-            client_secret=self.client_secret
-        )
+    def get_token_from_code(self, device_code):
+        creds = OAuthCredentials(self.client_id, self.client_secret)
+        token_info = creds.token_from_code(device_code)
+        if "expires_in" in token_info and "expires_at" not in token_info:
+            token_info["expires_at"] = time.time() + token_info["expires_in"]
+        if "scope" not in token_info:
+            token_info["scope"] = "https://www.googleapis.com/auth/youtube"
+        return token_info
 
+    def get_client(self, auth_info):
+        if not auth_info or not isinstance(auth_info, dict):
+            return None
+
+        creds = OAuthCredentials(self.client_id, self.client_secret)
         now = time.time()
-        if now > expires_at:
-            new_token = oauth_credentials.refresh_token(refresh_token)
+        expires_at = auth_info.get("expires_at", 0)
+        refresh_token = auth_info.get("refresh_token")
 
-            auth_data["access_token"] = new_token["access_token"]
-            auth_data["expires_at"] = now + new_token["expires_in"]        
+        if refresh_token and now >= expires_at:
+            try:
+                new_token = creds.refresh_token(refresh_token)
+                auth_info["access_token"] = new_token["access_token"]
+                auth_info["expires_at"] = now + new_token.get("expires_in", 3600)
+                if "refresh_token" in new_token:
+                    auth_info["refresh_token"] = new_token["refresh_token"]
+            except Exception as e:
+                print(f"Error refreshing YouTube token: {e}")
 
-            if "refresh_token" in new_token:
-                auth_data["refresh_token"] = new_token["refresh_token"]
-                refresh_token = new_token["refresh_token"]
-                
-            with open(self.auth_file, "w", encoding="utf-8") as f:
-                json.dump(auth_data, f, indent=2)
+        try:
+            return YTMusic(auth=auth_info, oauth_credentials=creds)
+        except Exception as e:
+            print(f"Error initializing YTMusic: {e}")
+            return None
 
-        self._client = YTMusic(self.auth_file, oauth_credentials=oauth_credentials)
-        return self._client
+    def create_playlist(self, client, name, description="Made from MusicMigrate"):
+        try:
+            playlist_id = client.create_playlist(title=name, description=description, privacy_status="PRIVATE")
+            return playlist_id
+        except Exception as e:
+            print(f"Error creating playlist '{name}': {e}")
+            return None
 
-    def create_playlist(self, name, description="Made from MusicMigrate"):
-        client = self.get_client()
-        playlist_id = client.create_playlist(title=name, description=description, privacy_status="PRIVATE")
-        return playlist_id
+    def add_songs_to_playlist(self, playlists, auth_info, progress_callback=None):
+        client = self.get_client(auth_info)
+        if not client:
+            raise ValueError("YouTube Music client could not be authenticated")
 
-    def add_songs_to_playlist(self, playlists, progress_callback=None):
-        client = self.get_client()
         could_not_find = {}
-        total_songs = sum([len(songs) for _, songs in playlists])
+        total_songs = sum([len(item[2]) if len(item) == 3 else len(item[1]) for item in playlists])
         total_playlists = len(playlists)
         
-        for curr_playlist, (playlist_name, songs) in enumerate(playlists, 1):
-            could_not_find[playlist_name] = [len(songs)]
-            playlist_id = self.create_playlist(playlist_name)
-            video_ids = set()
+        for curr_playlist, playlist_item in enumerate(playlists, 1):
+            if len(playlist_item) == 3:
+                _, playlist_name, songs = playlist_item
+            else:
+                playlist_name, songs = playlist_item
 
+            dict_key = playlist_name
+            if dict_key in could_not_find:
+                dict_key = f"{playlist_name} (#{curr_playlist})"
+
+            could_not_find[dict_key] = [len(songs)]
+
+            playlist_id = self.create_playlist(client, playlist_name)
+            if not playlist_id:
+                for track in songs:
+                    could_not_find[dict_key].append({
+                        "song": track.get("song", "Unknown"),
+                        "artists": track.get("artists", [])
+                    })
+                continue
+
+            video_ids = []
             total = len(songs)
+
             for curr_count, track in enumerate(songs, 1):
-                current_song = track["song"]
+                current_song = track.get("song", "Unknown")
                 if progress_callback:
                     progress_callback(
                         playlist_name=playlist_name,
@@ -94,43 +105,62 @@ class YouTubeMusicHandler:
                         total_playlists=total_playlists
                     )
 
-                search_artists = ' '.join([a for a in track["artists"] if isinstance(a, str) and a.strip()])
-                
-                # Search for songs first
-                result = client.search(query=f"{track['song']} {search_artists}", filter="songs", limit=5)[:5]
-                matched_song = self.match_song(result, track)
+                artists_list = track.get("artists", [])
+                search_artists = ' '.join([a for a in artists_list if isinstance(a, str) and a.strip()])
+                query = f"{current_song} {search_artists}".strip()
 
-                # If no match, search videos
+                matched_song = None
+                for attempt in range(2):
+                    try:
+                        result = client.search(query=query, filter="songs", limit=5)[:5]
+                        matched_song = self.match_song(result, track)
+                        break
+                    except Exception as e:
+                        time.sleep(1)
+
                 if not matched_song:
-                    result = client.search(query=f"{track['song']} {search_artists}", filter="videos", limit=5)[:5]
-                    matched_song = self.match_song(result, track)
+                    for attempt in range(2):
+                        try:
+                            result = client.search(query=query, filter="videos", limit=5)[:5]
+                            matched_song = self.match_song(result, track)
+                            break
+                        except Exception as e:
+                            time.sleep(1)
                 
                 if matched_song and "videoId" in matched_song:
-                    video_id = matched_song["videoId"]
-                    if video_id not in video_ids:
-                        video_ids.add(video_id)
+                    video_ids.append(matched_song["videoId"])
                 else:
-                    could_not_find[playlist_name].append({
-                        "song": track["song"],
-                        "artists": track["artists"]
+                    could_not_find[dict_key].append({
+                        "song": current_song,
+                        "artists": track.get("artists", [])
                     })
 
-                # Add songs in batches of 50
                 if len(video_ids) >= 50:
-                    client.add_playlist_items(
-                        playlistId=playlist_id,
-                        videoIds=list(video_ids),
-                        duplicates=True
-                    )
-                    video_ids = set()
+                    for attempt in range(2):
+                        try:
+                            client.add_playlist_items(
+                                playlistId=playlist_id,
+                                videoIds=video_ids,
+                                duplicates=True
+                            )
+                            break
+                        except Exception as e:
+                            print(f"Error adding batch to YT playlist: {e}")
+                            time.sleep(1)
+                    video_ids = []
             
-           
             if video_ids:
-                client.add_playlist_items(
-                    playlistId=playlist_id,
-                    videoIds=list(video_ids),
-                    duplicates=True
-                )
+                for attempt in range(2):
+                    try:
+                        client.add_playlist_items(
+                            playlistId=playlist_id,
+                            videoIds=video_ids,
+                            duplicates=True
+                        )
+                        break
+                    except Exception as e:
+                        print(f"Error adding final batch to YT playlist: {e}")
+                        time.sleep(1)
 
         return could_not_find
 
@@ -211,11 +241,9 @@ class YouTubeMusicHandler:
             title = self.clean_text(song.get("title"))
             result_artists = self.get_result_artists(song)  
 
-          
             featured_from_yt_title = self.extract_featured_artists(song.get("title", ""))
             result_artists += [self.clean_text(a) for a in featured_from_yt_title]
 
-            
             if "duration_seconds" in song and song["duration_seconds"]:
                 duration = song["duration_seconds"]
             elif "duration" in song and song["duration"]:
@@ -223,7 +251,6 @@ class YouTubeMusicHandler:
             else:
                 duration = 0
 
-            
             title_score = SequenceMatcher(None, title, target_title).ratio()
             artist_matches = [1 for a in result_artists for b in target_artists if self.is_similar(a, b)]
             artist_score = len(artist_matches) / max(len(target_artists), 1)
@@ -241,11 +268,3 @@ class YouTubeMusicHandler:
                 best_match = song
 
         return best_match
-
-    def search_songs(self, query, limit=10):
-        client = self.get_client()
-        return client.search(query=query, filter="songs", limit=limit)
-
-    def get_playlists(self):
-        client = self.get_client()
-        return client.get_library_playlists(limit=50)

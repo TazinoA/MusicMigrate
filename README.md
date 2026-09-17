@@ -1,6 +1,6 @@
 # Music Playlist Transfer
 
-This project allows you to transfer your playlists from Spotify to YoutubeMusic
+This project allows you to transfer your playlists between Spotify and YouTube Music.
 
 ## Getting Started
 
@@ -9,13 +9,12 @@ These instructions will get you a copy of the project up and running on your loc
 ### Prerequisites
 
 *   Node.js and npm
-*   Python 3 and pip
+*   Python 3 (`python3` or `py`) and pip
 
 ### Installation
 
 1.  **Clone the repository**
 
-    You can clone this repository to your local machine using the following command:
     ```bash
     git clone <repository-url>
     cd <repository-name>
@@ -36,10 +35,11 @@ These instructions will get you a copy of the project up and running on your loc
     ```bash
     pip install -r backend/requirements.txt
     ```
+    *(Note: Depending on your platform, use `python3 -m pip` or `py -m pip`.)*
 
 4.  **Environment Variables**
 
-    Create a file named `.env` in the `backend` directory. This file will store your API credentials and secret keys. Add the following variables to the `.env` file, replacing the placeholder text with your actual credentials:
+    Create a file named `.env` in the `backend` directory (or set environment variables in your environment). Add the following variables:
 
     ```
     SP_CLIENT_ID=your_spotify_client_id
@@ -51,27 +51,38 @@ These instructions will get you a copy of the project up and running on your loc
 
 ## Running the application
 
-To run the application, you will need to start both the backend and frontend servers.
+To run the application, start both the backend and frontend servers.
 
 1.  **Start the backend server**
 
-    In a terminal, run the following command to start the Python Flask server:
+    In a terminal, run the following command to start the Flask server:
 
     ```bash
-    python backend/server.py
+    python3 backend/server.py
     ```
+    *(On Windows systems where `python3` is not in PATH, use `py backend/server.py` or `python backend/server.py`.)*
 
-    The backend will be running on `http://localhost:8000`.
+    The backend will run on `http://localhost:8000`.
 
 2.  **Start the frontend server**
 
-    In a separate terminal, run the following command to start the Node.js Express server:
+    In a separate terminal, run:
 
     ```bash
     npm start
     ```
+    *(For development mode with auto-reload, run `npm run dev`.)*
 
-    The frontend will be running on `http://localhost:3000`.
+    The frontend will run on `http://localhost:3000`.
 
-You can now access the application by navigating to `http://localhost:3000` in your web browser.
+## Running Tests
 
+To run the automated tests for the backend:
+
+```bash
+npm test
+```
+or
+```bash
+python3 -m unittest discover -s backend/tests
+```
